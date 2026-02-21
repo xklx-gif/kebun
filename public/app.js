@@ -16,10 +16,11 @@ const cropLabel = {
 const harvestLabel = {
   HORENSO: "Horenso",
   TERONG: "Terong",
+  KONYAKU: "Konyaku",
   KONTENER_HORENSO: "Kontener Horenso",
 };
 
-const harvestTypes = ["HORENSO", "TERONG", "KONTENER_HORENSO"];
+const harvestTypes = ["HORENSO", "TERONG", "KONYAKU", "KONTENER_HORENSO"];
 const harvestChartStyle = {
   HORENSO: {
     border: "#2f7d32",
@@ -28,6 +29,10 @@ const harvestChartStyle = {
   TERONG: {
     border: "#e08b18",
     background: "rgba(224, 139, 24, 0.55)",
+  },
+  KONYAKU: {
+    border: "#6b5bcd",
+    background: "rgba(107, 91, 205, 0.55)",
   },
   KONTENER_HORENSO: {
     border: "#1f6feb",
@@ -327,12 +332,14 @@ async function onLogout() {
 }
 
 async function loadPublicLanding() {
-  const [summary, sprays, plantings, harvests, chartData] = await Promise.all([
+  const startDate = daysAgoISO(13);
+  const endDate = todayISO();
+  const [summary, sprays, plantings, harvests, chartSeries] = await Promise.all([
     api("/api/public/summary"),
     api("/api/public/sprays"),
     api("/api/public/plantings"),
     api("/api/public/harvests"),
-    api(`/api/public/charts/harvest-daily?startDate=${daysAgoISO(13)}&endDate=${todayISO()}`),
+    loadSeparatedHarvestSeries("/api/public/charts/harvest-daily", startDate, endDate),
   ]);
 
   startSummaryAnimation("public-summary-line", getSummaryLines(summary.summary));
@@ -375,17 +382,31 @@ async function loadPublicLanding() {
     .join("");
   $("public-harvest-body").innerHTML = harvestHtml || `<tr><td colspan="6">Belum ada data panen.</td></tr>`;
 
-  const chartItems = chartData.items || [];
-  const labels = chartItems.map((item) => item.date);
-  const values = chartItems.map((item) => Number(item.total_qty));
-  renderPublicChart(labels.length ? labels : ["Belum ada data"], values.length ? values : [0]);
-  $("public-chart-note").textContent = chartItems.length
-    ? "Akumulasi jumlah panen per hari."
+  const labels = chartSeries.labels || [];
+  const lineDatasets = harvestTypes.map((harvestType) => {
+    const style = harvestChartStyle[harvestType];
+    const byDate = chartSeries.dateMaps?.[harvestType] || new Map();
+    return {
+      label: harvestLabel[harvestType] || harvestType,
+      data: labels.map((date) => byDate.get(date) || 0),
+      borderColor: style.border,
+      backgroundColor: style.background,
+      fill: false,
+      tension: 0.32,
+      pointRadius: 2.5,
+    };
+  });
+
+  const chartLabels = labels.length ? labels : ["Belum ada data"];
+  const chartDatasets = labels.length ? lineDatasets : lineDatasets.map((dataset) => ({ ...dataset, data: [0] }));
+  renderPublicChart(chartLabels, chartDatasets);
+  $("public-chart-note").textContent = labels.length
+    ? "Panen harian ditampilkan terpisah per jenis panen dalam satu grafik."
     : "Belum ada data panen untuk ditampilkan.";
   applyResponsiveTableLabels();
 }
 
-function renderPublicChart(labels, values) {
+function renderPublicChart(labels, datasets) {
   const ctx = $("public-harvest-chart").getContext("2d");
   if (state.publicChart) {
     state.publicChart.destroy();
@@ -395,17 +416,7 @@ function renderPublicChart(labels, values) {
     type: "line",
     data: {
       labels,
-      datasets: [
-        {
-          label: "Panen Harian",
-          data: values,
-          borderColor: "#1f6feb",
-          backgroundColor: "rgba(31, 111, 235, 0.2)",
-          fill: true,
-          tension: 0.32,
-          pointRadius: 3,
-        },
-      ],
+      datasets,
     },
     options: {
       responsive: true,
@@ -809,23 +820,21 @@ async function loadSeparatedHarvestSeries(basePath, startDate, endDate) {
 }
 
 function renderCombinedChartTable(labels, dateMaps) {
-  setChartTableHeader(["Tanggal", "Horenso", "Terong", "Kontener Horenso", "Total"]);
+  const headers = ["Tanggal", ...harvestTypes.map((type) => harvestLabel[type] || type), "Total"];
+  setChartTableHeader(headers);
+
   if (!labels.length) {
-    $("chart-body").innerHTML = `<tr><td colspan="5">Belum ada data panen pada filter ini.</td></tr>`;
+    $("chart-body").innerHTML = `<tr><td colspan="${headers.length}">Belum ada data panen pada filter ini.</td></tr>`;
     return;
   }
 
   const html = labels
     .map((date) => {
-      const horenso = dateMaps.HORENSO?.get(date) || 0;
-      const terong = dateMaps.TERONG?.get(date) || 0;
-      const kontener = dateMaps.KONTENER_HORENSO?.get(date) || 0;
-      const total = horenso + terong + kontener;
+      const values = harvestTypes.map((type) => dateMaps[type]?.get(date) || 0);
+      const total = values.reduce((sum, value) => sum + value, 0);
       return `<tr>
         <td>${date}</td>
-        <td>${horenso}</td>
-        <td>${terong}</td>
-        <td>${kontener}</td>
+        ${values.map((value) => `<td>${value}</td>`).join("")}
         <td>${total}</td>
       </tr>`;
     })

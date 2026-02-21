@@ -53,7 +53,7 @@ function cropValid(crop) {
 }
 
 function harvestTypeValid(type) {
-  return type === "HORENSO" || type === "TERONG" || type === "KONTENER_HORENSO";
+  return type === "HORENSO" || type === "TERONG" || type === "KONYAKU" || type === "KONTENER_HORENSO";
 }
 
 function harvestUnitValid(unit) {
