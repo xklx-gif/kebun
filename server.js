@@ -49,11 +49,15 @@ function parseNumber(value) {
 }
 
 function cropValid(crop) {
-  return crop === "HORENSO" || crop === "TERONG";
+  return crop === "HORENSO" || crop === "TERONG" || crop === "KONYAKU";
 }
 
 function harvestTypeValid(type) {
   return type === "HORENSO" || type === "TERONG" || type === "KONTENER_HORENSO";
+}
+
+function harvestUnitValid(unit) {
+  return unit === "kardus" || unit === "kontainer";
 }
 
 function withUserName(table, alias, extraColumns) {
@@ -461,7 +465,7 @@ app.post("/api/sprays", authRequired, async (req, res, next) => {
       return res.status(400).json({ message: "Catatan wajib diisi." });
     }
     if (!cropValid(crop)) {
-      return res.status(400).json({ message: "Tanaman wajib Horenso atau Terong." });
+      return res.status(400).json({ message: "Tanaman wajib Horenso, Terong, atau Konyaku." });
     }
     if (!date) {
       return res.status(400).json({ message: "Tanggal wajib diisi dengan format YYYY-MM-DD." });
@@ -591,7 +595,7 @@ app.post("/api/plantings", authRequired, async (req, res, next) => {
       return res.status(400).json({ message: "Catatan wajib diisi." });
     }
     if (!cropValid(crop)) {
-      return res.status(400).json({ message: "Tanaman wajib Horenso atau Terong." });
+      return res.status(400).json({ message: "Tanaman wajib Horenso, Terong, atau Konyaku." });
     }
     if (!date) {
       return res.status(400).json({ message: "Tanggal wajib valid." });
@@ -734,7 +738,11 @@ app.post("/api/harvests", authRequired, async (req, res, next) => {
     if (harvestType === "KONTENER_HORENSO") {
       unit = "kontainer";
     } else if (!unit) {
-      unit = "kg";
+      unit = "kardus";
+    }
+
+    if (!harvestUnitValid(unit)) {
+      return res.status(400).json({ message: "Satuan panen harus kardus atau kontainer." });
     }
 
     const inserted = await pool.query(
@@ -772,7 +780,11 @@ app.put("/api/harvests/:id", authRequired, async (req, res, next) => {
     if (harvestType === "KONTENER_HORENSO") {
       unit = "kontainer";
     } else if (!unit) {
-      unit = "kg";
+      unit = "kardus";
+    }
+
+    if (!harvestUnitValid(unit)) {
+      return res.status(400).json({ message: "Satuan panen harus kardus atau kontainer." });
     }
 
     const updated = await pool.query(

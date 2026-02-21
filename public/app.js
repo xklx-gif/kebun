@@ -5,9 +5,12 @@
   publicChart: null,
 };
 
+const summaryAnimations = {};
+
 const cropLabel = {
   HORENSO: "Horenso",
   TERONG: "Terong",
+  KONYAKU: "Konyaku",
 };
 
 const harvestLabel = {
@@ -17,6 +20,12 @@ const harvestLabel = {
 };
 
 const $ = (id) => document.getElementById(id);
+
+const cropFromLabel = Object.fromEntries(
+  Object.entries(cropLabel).map(([code, label]) => [label.toLowerCase(), code])
+);
+
+const allowedHarvestUnits = new Set(["kardus", "kontainer"]);
 
 function todayISO() {
   const d = new Date();
@@ -73,12 +82,85 @@ async function api(url, options = {}) {
   }
 }
 
+function getSummaryLines(summary) {
+  return [
+    `Penyemprotan hari ini: ${summary.sprayToday}`,
+    `Penanaman hari ini: ${summary.plantingToday}`,
+    `Total panen hari ini: ${summary.harvestToday}`,
+    `Total panen 7 hari: ${summary.harvestWeek}`,
+  ];
+}
+
+function stopSummaryAnimation(elementId) {
+  const anim = summaryAnimations[elementId];
+  if (!anim) return;
+  clearInterval(anim.timer);
+  clearTimeout(anim.swapTimer);
+  anim.timer = null;
+  anim.swapTimer = null;
+}
+
+function setSummaryFallback(elementId, text) {
+  stopSummaryAnimation(elementId);
+  const el = $(elementId);
+  if (!el) return;
+  el.classList.remove("vapor-in", "vapor-out");
+  el.textContent = text;
+}
+
+function rotateSummaryLine(elementId, isFirst = false) {
+  const el = $(elementId);
+  const anim = summaryAnimations[elementId];
+  if (!el || !anim || !anim.lines.length) return;
+
+  const showLine = () => {
+    el.classList.remove("vapor-in");
+    void el.offsetWidth;
+    el.classList.add("vapor-in");
+  };
+
+  if (isFirst || anim.index < 0) {
+    anim.index = 0;
+    el.classList.remove("vapor-out");
+    el.textContent = anim.lines[anim.index];
+    showLine();
+    return;
+  }
+
+  el.classList.remove("vapor-in");
+  el.classList.add("vapor-out");
+  clearTimeout(anim.swapTimer);
+  anim.swapTimer = setTimeout(() => {
+    anim.index = (anim.index + 1) % anim.lines.length;
+    el.classList.remove("vapor-out");
+    el.textContent = anim.lines[anim.index];
+    showLine();
+  }, 230);
+}
+
+function startSummaryAnimation(elementId, lines) {
+  const el = $(elementId);
+  if (!el) return;
+
+  stopSummaryAnimation(elementId);
+  summaryAnimations[elementId] = {
+    lines: lines.length ? lines : ["-"],
+    index: -1,
+    timer: null,
+    swapTimer: null,
+  };
+
+  rotateSummaryLine(elementId, true);
+  if (summaryAnimations[elementId].lines.length > 1) {
+    summaryAnimations[elementId].timer = setInterval(() => {
+      rotateSummaryLine(elementId);
+    }, 2600);
+  }
+}
+
 function renderPublicFallback(message) {
   const fallback = message || "Data belum tersedia.";
-  $("public-sum-spray").textContent = "-";
-  $("public-sum-planting").textContent = "-";
-  $("public-sum-harvest-day").textContent = "-";
-  $("public-sum-harvest-week").textContent = "-";
+  setSummaryFallback("public-summary-line", fallback);
   $("public-spray-body").innerHTML = `<tr><td colspan="4">${fallback}</td></tr>`;
   $("public-planting-body").innerHTML = `<tr><td colspan="4">${fallback}</td></tr>`;
   $("public-harvest-body").innerHTML = `<tr><td colspan="6">${fallback}</td></tr>`;
@@ -96,6 +178,11 @@ function setModeAuthenticated(loggedIn) {
   $("landing-view").classList.toggle("hidden", loggedIn);
   $("app-view").classList.toggle("hidden", !loggedIn);
   if (loggedIn) {
+    stopSummaryAnimation("public-summary-line");
+  } else {
+    stopSummaryAnimation("summary-line");
+  }
+  if (loggedIn) {
     $("login-view").classList.add("hidden");
   }
 }
@@ -110,6 +197,10 @@ function hideLoginPanel() {
 
 function closeMenu() {
   $("top-menu").classList.add("hidden");
+}
+
+function cropCodeFromCellText(text) {
+  return cropFromLabel[String(text || "").trim().toLowerCase()] || "HORENSO";
 }
 
 function setPage(page) {
@@ -228,10 +319,7 @@ async function loadPublicLanding() {
     api(`/api/public/charts/harvest-daily?startDate=${daysAgoISO(13)}&endDate=${todayISO()}`),
   ]);
 
-  $("public-sum-spray").textContent = summary.summary.sprayToday;
-  $("public-sum-planting").textContent = summary.summary.plantingToday;
-  $("public-sum-harvest-day").textContent = summary.summary.harvestToday;
-  $("public-sum-harvest-week").textContent = summary.summary.harvestWeek;
+  startSummaryAnimation("public-summary-line", getSummaryLines(summary.summary));
 
   const sprayHtml = sprays.items
     .map(
@@ -321,10 +409,7 @@ async function loadDashboard() {
     api("/api/dashboard/recent"),
   ]);
 
-  $("sum-spray").textContent = summary.summary.sprayToday;
-  $("sum-planting").textContent = summary.summary.plantingToday;
-  $("sum-harvest-day").textContent = summary.summary.harvestToday;
-  $("sum-harvest-week").textContent = summary.summary.harvestWeek;
+  startSummaryAnimation("summary-line", getSummaryLines(summary.summary));
 
   const html = recent.items
     .map((item) => {
@@ -432,7 +517,7 @@ async function onSprayAction(event) {
   const row = button.closest("tr");
   $("spray-id").value = id;
   $("spray-date").value = row.children[0].textContent;
-  $("spray-crop").value = row.children[1].textContent.trim().toUpperCase() === "HORENSO" ? "HORENSO" : "TERONG";
+  $("spray-crop").value = cropCodeFromCellText(row.children[1].textContent);
   $("spray-location").value = row.children[2].textContent;
   $("spray-note").value = row.children[3].textContent;
   $("spray-submit").textContent = "Update Penyemprotan";
@@ -520,7 +605,7 @@ async function onPlantingAction(event) {
   const row = button.closest("tr");
   $("planting-id").value = id;
   $("planting-date").value = row.children[0].textContent;
-  $("planting-crop").value = row.children[1].textContent.trim().toUpperCase() === "HORENSO" ? "HORENSO" : "TERONG";
+  $("planting-crop").value = cropCodeFromCellText(row.children[1].textContent);
   $("planting-location").value = row.children[2].textContent;
   $("planting-note").value = row.children[3].textContent;
   $("planting-submit").textContent = "Update Penanaman";
@@ -535,8 +620,8 @@ function syncHarvestUnitByType() {
     unit.disabled = true;
   } else {
     unit.disabled = false;
-    if (!unit.value) {
-      unit.value = "kg";
+    if (!allowedHarvestUnits.has(unit.value)) {
+      unit.value = "kardus";
     }
   }
 }
@@ -545,7 +630,7 @@ function resetHarvestForm() {
   $("harvest-id").value = "";
   $("harvest-form").reset();
   $("harvest-date").value = todayISO();
-  $("harvest-unit").value = "kg";
+  $("harvest-unit").value = "kardus";
   $("harvest-submit").textContent = "Simpan Panen";
   $("harvest-cancel").classList.add("hidden");
   syncHarvestUnitByType();
@@ -633,7 +718,7 @@ async function onHarvestAction(event) {
   $("harvest-date").value = row.children[0].textContent;
   $("harvest-type").value = type;
   $("harvest-qty").value = row.children[2].textContent;
-  $("harvest-unit").value = row.children[3].textContent;
+  $("harvest-unit").value = String(row.children[3].textContent || "").trim().toLowerCase();
   $("harvest-location").value = row.children[4].textContent === "-" ? "" : row.children[4].textContent;
   $("harvest-note").value = row.children[5].textContent === "-" ? "" : row.children[5].textContent;
   $("harvest-submit").textContent = "Update Panen";

@@ -30,23 +30,8 @@
         </header>
 
         <section class="card page landing-page">
-          <div class="summary-grid modern-kpi">
-            <article class="summary-box kpi-a">
-              <h3>Penyemprotan Hari Ini</h3>
-              <p id="public-sum-spray">0</p>
-            </article>
-            <article class="summary-box kpi-b">
-              <h3>Penanaman Hari Ini</h3>
-              <p id="public-sum-planting">0</p>
-            </article>
-            <article class="summary-box kpi-c">
-              <h3>Total Panen Hari Ini</h3>
-              <p id="public-sum-harvest-day">0</p>
-            </article>
-            <article class="summary-box kpi-d">
-              <h3>Total Panen 7 Hari</h3>
-              <p id="public-sum-harvest-week">0</p>
-            </article>
+          <div class="summary-line-panel">
+            <p id="public-summary-line" class="summary-line">Memuat ringkasan...</p>
           </div>
 
           <article class="landing-panel">
@@ -163,29 +148,8 @@
         </nav>
 
         <section id="page-dashboard" class="page card">
-          <div class="summary-grid modern-kpi">
-            <article class="summary-box kpi-a">
-              <h3>Penyemprotan Hari Ini</h3>
-              <p id="sum-spray">0</p>
-            </article>
-            <article class="summary-box kpi-b">
-              <h3>Penanaman Hari Ini</h3>
-              <p id="sum-planting">0</p>
-            </article>
-            <article class="summary-box kpi-c">
-              <h3>Total Panen Hari Ini</h3>
-              <p id="sum-harvest-day">0</p>
-            </article>
-            <article class="summary-box kpi-d">
-              <h3>Total Panen 7 Hari</h3>
-              <p id="sum-harvest-week">0</p>
-            </article>
-          </div>
-
-          <div class="shortcut-row">
-            <button class="shortcut-btn" data-page="spray">Tambah Penyemprotan</button>
-            <button class="shortcut-btn" data-page="planting">Tambah Penanaman</button>
-            <button class="shortcut-btn" data-page="harvest">Tambah Panen</button>
+          <div class="summary-line-panel">
+            <p id="summary-line" class="summary-line">Memuat ringkasan...</p>
           </div>
 
           <article class="dashboard-panel">
@@ -253,6 +217,7 @@
               <select id="spray-crop" required>
                 <option value="HORENSO">Horenso</option>
                 <option value="TERONG">Terong</option>
+                <option value="KONYAKU">Konyaku</option>
               </select>
             </label>
             <label>
@@ -276,6 +241,7 @@
                 <option value="ALL">Semua</option>
                 <option value="HORENSO">Horenso</option>
                 <option value="TERONG">Terong</option>
+                <option value="KONYAKU">Konyaku</option>
               </select>
             </label>
             <label>Tempat <input id="spray-filter-location" /></label>
@@ -308,6 +274,7 @@
               <select id="planting-crop" required>
                 <option value="HORENSO">Horenso</option>
                 <option value="TERONG">Terong</option>
+                <option value="KONYAKU">Konyaku</option>
               </select>
             </label>
             <label>
@@ -335,6 +302,7 @@
                 <option value="ALL">Semua</option>
                 <option value="HORENSO">Horenso</option>
                 <option value="TERONG">Terong</option>
+                <option value="KONYAKU">Konyaku</option>
               </select>
             </label>
             <label>Tempat <input id="planting-filter-location" /></label>
@@ -381,7 +349,6 @@
             <label>
               Satuan
               <select id="harvest-unit">
-                <option value="kg">kg</option>
                 <option value="kardus">kardus</option>
                 <option value="kontainer">kontainer</option>
               </select>
