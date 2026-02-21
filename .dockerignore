@@ -1,0 +1,8 @@
+node_modules
+npm-debug.log
+data/*.db
+data/*.db-shm
+data/*.db-wal
+lt.log
+lt.err.log
+.tmp_*

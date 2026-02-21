@@ -1,0 +1,445 @@
+﻿<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kebun Log Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <div class="background-shape bg-a"></div>
+    <div class="background-shape bg-b"></div>
+
+    <main class="shell">
+      <section id="landing-view" class="landing-view">
+        <header class="card landing-hero">
+          <div>
+            <h1>Kebun Log Dashboard</h1>
+            <p>Monitoring publik hasil panen, pencatatan penyemprotan, dan penanaman secara real-time.</p>
+            <small class="public-note">Mode publik: hanya baca data, tidak bisa mengubah apa pun.</small>
+          </div>
+          <div class="landing-actions">
+            <button id="show-login-btn" class="ghost-btn" type="button">Login Admin</button>
+          </div>
+        </header>
+
+        <section class="card page landing-page">
+          <div class="summary-grid modern-kpi">
+            <article class="summary-box kpi-a">
+              <h3>Penyemprotan Hari Ini</h3>
+              <p id="public-sum-spray">0</p>
+            </article>
+            <article class="summary-box kpi-b">
+              <h3>Penanaman Hari Ini</h3>
+              <p id="public-sum-planting">0</p>
+            </article>
+            <article class="summary-box kpi-c">
+              <h3>Total Panen Hari Ini</h3>
+              <p id="public-sum-harvest-day">0</p>
+            </article>
+            <article class="summary-box kpi-d">
+              <h3>Total Panen 7 Hari</h3>
+              <p id="public-sum-harvest-week">0</p>
+            </article>
+          </div>
+
+          <article class="landing-panel">
+            <h3>Grafik Panen (14 Hari Terakhir)</h3>
+            <div class="chart-wrap public-chart-wrap">
+              <canvas id="public-harvest-chart"></canvas>
+            </div>
+            <p id="public-chart-note" class="public-chart-note">Memuat grafik panen...</p>
+          </article>
+
+          <div class="landing-data-grid">
+            <article class="landing-panel">
+              <h3>Hasil Panen Terbaru</h3>
+              <div class="table-wrap table-soft">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tanggal</th>
+                      <th>Jenis Panen</th>
+                      <th>Jumlah</th>
+                      <th>Satuan</th>
+                      <th>Tempat</th>
+                      <th>Catatan</th>
+                    </tr>
+                  </thead>
+                  <tbody id="public-harvest-body">
+                    <tr><td colspan="6">Memuat data panen...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="landing-panel">
+              <h3>Pencatatan Penyemprotan</h3>
+              <div class="table-wrap table-soft">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tanggal</th>
+                      <th>Tanaman</th>
+                      <th>Tempat</th>
+                      <th>Catatan</th>
+                    </tr>
+                  </thead>
+                  <tbody id="public-spray-body">
+                    <tr><td colspan="4">Memuat data penyemprotan...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="landing-panel">
+              <h3>Pencatatan Penanaman</h3>
+              <div class="table-wrap table-soft">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tanggal</th>
+                      <th>Tanaman</th>
+                      <th>Tempat</th>
+                      <th>Catatan</th>
+                    </tr>
+                  </thead>
+                  <tbody id="public-planting-body">
+                    <tr><td colspan="4">Memuat data penanaman...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+        </section>
+      </section>
+
+      <section id="login-view" class="card login-card hidden">
+        <h2>Login Admin</h2>
+        <p>Masuk untuk mengelola data kebun.</p>
+        <form id="login-form" class="form-grid">
+          <label>
+            Email
+            <input id="login-email" name="email" type="email" required placeholder="admin@kebun.local" />
+          </label>
+          <label>
+            Password
+            <input id="login-password" name="password" type="password" required placeholder="******" />
+          </label>
+          <button type="submit">Login</button>
+          <button id="hide-login-btn" type="button" class="ghost-btn">Tutup</button>
+        </form>
+        <small>Default akun: admin@kebun.local / admin123</small>
+      </section>
+
+      <section id="app-view" class="hidden">
+        <header class="topbar card">
+          <div>
+            <h2>Kebun Log Dashboard</h2>
+            <p id="active-user"></p>
+          </div>
+          <div class="menu-wrap">
+            <button id="menu-toggle" class="ghost-btn" type="button" aria-label="Buka menu">☰ Menu</button>
+            <div id="top-menu" class="menu-dropdown hidden">
+              <button class="menu-link" data-page="dashboard">Dashboard</button>
+              <button class="menu-link" data-page="spray">Penyemprotan</button>
+              <button class="menu-link" data-page="planting">Penanaman</button>
+              <button class="menu-link" data-page="harvest">Panen</button>
+              <button class="menu-link danger" id="logout-btn">Logout</button>
+            </div>
+          </div>
+        </header>
+
+        <nav class="quick-tabs">
+          <button class="tab-btn active" data-page="dashboard">Dashboard</button>
+          <button class="tab-btn" data-page="spray">Penyemprotan</button>
+          <button class="tab-btn" data-page="planting">Penanaman</button>
+          <button class="tab-btn" data-page="harvest">Panen</button>
+        </nav>
+
+        <section id="page-dashboard" class="page card">
+          <div class="summary-grid modern-kpi">
+            <article class="summary-box kpi-a">
+              <h3>Penyemprotan Hari Ini</h3>
+              <p id="sum-spray">0</p>
+            </article>
+            <article class="summary-box kpi-b">
+              <h3>Penanaman Hari Ini</h3>
+              <p id="sum-planting">0</p>
+            </article>
+            <article class="summary-box kpi-c">
+              <h3>Total Panen Hari Ini</h3>
+              <p id="sum-harvest-day">0</p>
+            </article>
+            <article class="summary-box kpi-d">
+              <h3>Total Panen 7 Hari</h3>
+              <p id="sum-harvest-week">0</p>
+            </article>
+          </div>
+
+          <div class="shortcut-row">
+            <button class="shortcut-btn" data-page="spray">Tambah Penyemprotan</button>
+            <button class="shortcut-btn" data-page="planting">Tambah Penanaman</button>
+            <button class="shortcut-btn" data-page="harvest">Tambah Panen</button>
+          </div>
+
+          <article class="dashboard-panel">
+            <div class="dashboard-panel-head">
+              <h3>Grafik Panen per Hari</h3>
+              <form id="chart-filter" class="filter-grid chart-filter-grid">
+                <label>Dari <input id="chart-start" type="date" /></label>
+                <label>Sampai <input id="chart-end" type="date" /></label>
+                <label>
+                  Jenis Panen
+                  <select id="chart-type">
+                    <option value="ALL">Semua</option>
+                    <option value="HORENSO">Horenso</option>
+                    <option value="TERONG">Terong</option>
+                    <option value="KONTENER_HORENSO">Kontener Horenso</option>
+                  </select>
+                </label>
+                <button type="submit">Tampilkan</button>
+              </form>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="harvest-chart"></canvas>
+            </div>
+            <div class="table-wrap table-soft">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Total Jumlah</th>
+                  </tr>
+                </thead>
+                <tbody id="chart-body"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <h3>Aktivitas Terbaru</h3>
+          <div class="table-wrap table-soft">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Jenis</th>
+                  <th>Detail</th>
+                  <th>Tempat</th>
+                  <th>Catatan</th>
+                  <th>Dibuat Oleh</th>
+                </tr>
+              </thead>
+              <tbody id="recent-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="page-spray" class="page card hidden">
+          <h3>Penyemprotan</h3>
+          <form id="spray-form" class="form-grid form-4">
+            <input type="hidden" id="spray-id" />
+            <label>
+              Catatan
+              <input id="spray-note" required />
+            </label>
+            <label>
+              Tanaman
+              <select id="spray-crop" required>
+                <option value="HORENSO">Horenso</option>
+                <option value="TERONG">Terong</option>
+              </select>
+            </label>
+            <label>
+              Tanggal
+              <input id="spray-date" type="date" required />
+            </label>
+            <label>
+              Tempat
+              <input id="spray-location" required />
+            </label>
+            <button type="submit" id="spray-submit">Simpan Penyemprotan</button>
+            <button type="button" id="spray-cancel" class="ghost-btn hidden">Batal Edit</button>
+          </form>
+
+          <form id="spray-filter" class="filter-grid">
+            <label>Dari <input id="spray-start" type="date" /></label>
+            <label>Sampai <input id="spray-end" type="date" /></label>
+            <label>
+              Tanaman
+              <select id="spray-filter-crop">
+                <option value="ALL">Semua</option>
+                <option value="HORENSO">Horenso</option>
+                <option value="TERONG">Terong</option>
+              </select>
+            </label>
+            <label>Tempat <input id="spray-filter-location" /></label>
+            <button type="submit">Filter</button>
+          </form>
+
+          <div class="table-wrap table-soft">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Tanaman</th>
+                  <th>Tempat</th>
+                  <th>Catatan</th>
+                  <th>Dibuat Oleh</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="spray-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="page-planting" class="page card hidden">
+          <h3>Penanaman</h3>
+          <form id="planting-form" class="form-grid form-4">
+            <input type="hidden" id="planting-id" />
+            <label>
+              Tanaman
+              <select id="planting-crop" required>
+                <option value="HORENSO">Horenso</option>
+                <option value="TERONG">Terong</option>
+              </select>
+            </label>
+            <label>
+              Catatan
+              <input id="planting-note" required />
+            </label>
+            <label>
+              Tempat
+              <input id="planting-location" required />
+            </label>
+            <label>
+              Tanggal
+              <input id="planting-date" type="date" />
+            </label>
+            <button type="submit" id="planting-submit">Simpan Penanaman</button>
+            <button type="button" id="planting-cancel" class="ghost-btn hidden">Batal Edit</button>
+          </form>
+
+          <form id="planting-filter" class="filter-grid">
+            <label>Dari <input id="planting-start" type="date" /></label>
+            <label>Sampai <input id="planting-end" type="date" /></label>
+            <label>
+              Tanaman
+              <select id="planting-filter-crop">
+                <option value="ALL">Semua</option>
+                <option value="HORENSO">Horenso</option>
+                <option value="TERONG">Terong</option>
+              </select>
+            </label>
+            <label>Tempat <input id="planting-filter-location" /></label>
+            <button type="submit">Filter</button>
+          </form>
+
+          <div class="table-wrap table-soft">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Tanaman</th>
+                  <th>Tempat</th>
+                  <th>Catatan</th>
+                  <th>Dibuat Oleh</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="planting-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="page-harvest" class="page card hidden">
+          <h3>Panen</h3>
+          <form id="harvest-form" class="form-grid form-4">
+            <input type="hidden" id="harvest-id" />
+            <label>
+              Jenis Panen
+              <select id="harvest-type" required>
+                <option value="HORENSO">Horenso</option>
+                <option value="TERONG">Terong</option>
+                <option value="KONTENER_HORENSO">Kontener Horenso</option>
+              </select>
+            </label>
+            <label>
+              Tanggal
+              <input id="harvest-date" type="date" required />
+            </label>
+            <label>
+              Jumlah
+              <input id="harvest-qty" type="number" min="0" step="0.01" required />
+            </label>
+            <label>
+              Satuan
+              <select id="harvest-unit">
+                <option value="kg">kg</option>
+                <option value="kardus">kardus</option>
+                <option value="kontainer">kontainer</option>
+              </select>
+            </label>
+            <label>
+              Tempat
+              <input id="harvest-location" />
+            </label>
+            <label>
+              Catatan
+              <input id="harvest-note" />
+            </label>
+            <button type="submit" id="harvest-submit">Simpan Panen</button>
+            <button type="button" id="harvest-cancel" class="ghost-btn hidden">Batal Edit</button>
+          </form>
+
+          <form id="harvest-filter" class="filter-grid">
+            <label>Dari <input id="harvest-start" type="date" /></label>
+            <label>Sampai <input id="harvest-end" type="date" /></label>
+            <label>
+              Jenis
+              <select id="harvest-filter-type">
+                <option value="ALL">Semua</option>
+                <option value="HORENSO">Horenso</option>
+                <option value="TERONG">Terong</option>
+                <option value="KONTENER_HORENSO">Kontener Horenso</option>
+              </select>
+            </label>
+            <label>Tempat <input id="harvest-filter-location" /></label>
+            <button type="submit">Filter</button>
+          </form>
+
+          <div class="table-wrap table-soft">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Jenis Panen</th>
+                  <th>Jumlah</th>
+                  <th>Satuan</th>
+                  <th>Tempat</th>
+                  <th>Catatan</th>
+                  <th>Dibuat Oleh</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="harvest-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <div id="loading" class="loading hidden">Memuat...</div>
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
