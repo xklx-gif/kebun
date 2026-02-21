@@ -19,6 +19,22 @@ const harvestLabel = {
   KONTENER_HORENSO: "Kontener Horenso",
 };
 
+const harvestTypes = ["HORENSO", "TERONG", "KONTENER_HORENSO"];
+const harvestChartStyle = {
+  HORENSO: {
+    border: "#2f7d32",
+    background: "rgba(47, 125, 50, 0.55)",
+  },
+  TERONG: {
+    border: "#e08b18",
+    background: "rgba(224, 139, 24, 0.55)",
+  },
+  KONTENER_HORENSO: {
+    border: "#1f6feb",
+    background: "rgba(31, 111, 235, 0.55)",
+  },
+};
+
 const $ = (id) => document.getElementById(id);
 
 const cropFromLabel = Object.fromEntries(
@@ -726,7 +742,7 @@ async function onHarvestAction(event) {
   syncHarvestUnitByType();
 }
 
-function renderChart(labels, values) {
+function renderChart(labels, datasets) {
   const ctx = $("harvest-chart").getContext("2d");
 
   if (state.chart) {
@@ -737,15 +753,7 @@ function renderChart(labels, values) {
     type: "bar",
     data: {
       labels,
-      datasets: [
-        {
-          label: "Jumlah Panen",
-          data: values,
-          borderColor: "#2f7d32",
-          backgroundColor: "rgba(47, 125, 50, 0.55)",
-          borderWidth: 1,
-        },
-      ],
+      datasets,
     },
     options: {
       responsive: true,
@@ -759,23 +767,121 @@ function renderChart(labels, values) {
   });
 }
 
+function setChartTableHeader(columns) {
+  $("chart-head").innerHTML = `<tr>${columns.map((title) => `<th>${title}</th>`).join("")}</tr>`;
+}
+
+async function loadSeparatedHarvestSeries(basePath, startDate, endDate) {
+  const responses = await Promise.all(
+    harvestTypes.map(async (harvestType) => {
+      const query = serializeQuery({ startDate, endDate, harvestType });
+      const result = await api(`${basePath}${query}`);
+      return { harvestType, items: result.items || [] };
+    })
+  );
+
+  const labelSet = new Set();
+  const dateMaps = {};
+
+  responses.forEach(({ harvestType, items }) => {
+    const byDate = new Map();
+    items.forEach((item) => {
+      labelSet.add(item.date);
+      byDate.set(item.date, Number(item.total_qty) || 0);
+    });
+    dateMaps[harvestType] = byDate;
+  });
+
+  const labels = Array.from(labelSet).sort();
+  const datasets = harvestTypes.map((harvestType) => {
+    const style = harvestChartStyle[harvestType];
+    const byDate = dateMaps[harvestType] || new Map();
+    return {
+      label: harvestLabel[harvestType] || harvestType,
+      data: labels.map((date) => byDate.get(date) || 0),
+      borderColor: style.border,
+      backgroundColor: style.background,
+      borderWidth: 1,
+    };
+  });
+
+  return { labels, datasets, dateMaps };
+}
+
+function renderCombinedChartTable(labels, dateMaps) {
+  setChartTableHeader(["Tanggal", "Horenso", "Terong", "Kontener Horenso", "Total"]);
+  if (!labels.length) {
+    $("chart-body").innerHTML = `<tr><td colspan="5">Belum ada data panen pada filter ini.</td></tr>`;
+    return;
+  }
+
+  const html = labels
+    .map((date) => {
+      const horenso = dateMaps.HORENSO?.get(date) || 0;
+      const terong = dateMaps.TERONG?.get(date) || 0;
+      const kontener = dateMaps.KONTENER_HORENSO?.get(date) || 0;
+      const total = horenso + terong + kontener;
+      return `<tr>
+        <td>${date}</td>
+        <td>${horenso}</td>
+        <td>${terong}</td>
+        <td>${kontener}</td>
+        <td>${total}</td>
+      </tr>`;
+    })
+    .join("");
+
+  $("chart-body").innerHTML = html;
+}
+
+function renderSingleChartTable(items, harvestType) {
+  const label = harvestLabel[harvestType] || harvestType;
+  setChartTableHeader(["Tanggal", `Jumlah ${label}`]);
+
+  const html = items.map((item) => `<tr><td>${item.date}</td><td>${Number(item.total_qty) || 0}</td></tr>`).join("");
+  $("chart-body").innerHTML = html || `<tr><td colspan="2">Belum ada data panen pada filter ini.</td></tr>`;
+}
+
 async function loadChart() {
+  const startDate = $("chart-start").value;
+  const endDate = $("chart-end").value;
+  const harvestType = $("chart-type").value;
+
+  if (harvestType === "ALL") {
+    const { labels, datasets, dateMaps } = await loadSeparatedHarvestSeries("/api/charts/harvest-daily", startDate, endDate);
+    const chartLabels = labels.length ? labels : ["Belum ada data"];
+    const chartDatasets = labels.length ? datasets : datasets.map((dataset) => ({ ...dataset, data: [0] }));
+    renderChart(chartLabels, chartDatasets);
+    renderCombinedChartTable(labels, dateMaps);
+    applyResponsiveTableLabels();
+    return;
+  }
+
   const query = serializeQuery({
-    startDate: $("chart-start").value,
-    endDate: $("chart-end").value,
-    harvestType: $("chart-type").value,
+    startDate,
+    endDate,
+    harvestType,
   });
   const result = await api(`/api/charts/harvest-daily${query}`);
-
   const items = result.items || [];
-  const labels = items.map((it) => it.date);
-  const values = items.map((it) => Number(it.total_qty));
-  renderChart(labels.length ? labels : ["Belum ada data"], values.length ? values : [0]);
+  const labels = items.map((item) => item.date);
+  const values = items.map((item) => Number(item.total_qty) || 0);
+  const style = harvestChartStyle[harvestType] || harvestChartStyle.HORENSO;
 
-  const html = items
-    .map((it) => `<tr><td>${it.date}</td><td>${it.total_qty}</td></tr>`)
-    .join("");
-  $("chart-body").innerHTML = html || `<tr><td colspan="2">Belum ada data panen pada filter ini.</td></tr>`;
+  renderChart(
+    labels.length ? labels : ["Belum ada data"],
+    [
+      {
+        label: `Jumlah ${harvestLabel[harvestType] || harvestType}`,
+        data: values.length ? values : [0],
+        borderColor: style.border,
+        backgroundColor: style.background,
+        borderWidth: 1,
+      },
+    ]
+  );
+
+  renderSingleChartTable(items, harvestType);
   applyResponsiveTableLabels();
 }
 
