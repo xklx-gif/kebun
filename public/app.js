@@ -83,6 +83,7 @@ function renderPublicFallback(message) {
   $("public-planting-body").innerHTML = `<tr><td colspan="4">${fallback}</td></tr>`;
   $("public-harvest-body").innerHTML = `<tr><td colspan="6">${fallback}</td></tr>`;
   $("public-chart-note").textContent = fallback;
+  applyResponsiveTableLabels();
 }
 
 function requireValue(value, name) {
@@ -141,6 +142,24 @@ function serializeQuery(paramsObj) {
   });
   const q = sp.toString();
   return q ? `?${q}` : "";
+}
+
+function applyResponsiveTableLabels() {
+  const tables = document.querySelectorAll(".table-wrap table");
+  tables.forEach((table) => {
+    const headers = Array.from(table.querySelectorAll("thead th")).map((th) => th.textContent.trim());
+    const cells = table.querySelectorAll("tbody td");
+    cells.forEach((td, idx) => {
+      if (td.hasAttribute("colspan")) {
+        td.removeAttribute("data-label");
+        return;
+      }
+      const header = headers[idx % headers.length];
+      if (header) {
+        td.setAttribute("data-label", header);
+      }
+    });
+  });
 }
 
 async function checkSession() {
@@ -259,6 +278,7 @@ async function loadPublicLanding() {
   $("public-chart-note").textContent = chartItems.length
     ? "Akumulasi jumlah panen per hari."
     : "Belum ada data panen untuk ditampilkan.";
+  applyResponsiveTableLabels();
 }
 
 function renderPublicChart(labels, values) {
@@ -322,6 +342,7 @@ async function loadDashboard() {
     .join("");
 
   $("recent-body").innerHTML = html || `<tr><td colspan="6">Belum ada aktivitas.</td></tr>`;
+  applyResponsiveTableLabels();
 }
 
 async function refreshChartWhenDashboardVisible() {
@@ -359,6 +380,7 @@ async function loadSprays() {
     )
     .join("");
   $("spray-body").innerHTML = html || `<tr><td colspan="6">Belum ada data penyemprotan.</td></tr>`;
+  applyResponsiveTableLabels();
 }
 
 async function submitSpray(event) {
@@ -446,6 +468,7 @@ async function loadPlantings() {
     )
     .join("");
   $("planting-body").innerHTML = html || `<tr><td colspan="6">Belum ada data penanaman.</td></tr>`;
+  applyResponsiveTableLabels();
 }
 
 async function submitPlanting(event) {
@@ -551,6 +574,7 @@ async function loadHarvests() {
     )
     .join("");
   $("harvest-body").innerHTML = html || `<tr><td colspan="8">Belum ada data panen.</td></tr>`;
+  applyResponsiveTableLabels();
 }
 
 async function submitHarvest(event) {
@@ -667,6 +691,7 @@ async function loadChart() {
     .map((it) => `<tr><td>${it.date}</td><td>${it.total_qty}</td></tr>`)
     .join("");
   $("chart-body").innerHTML = html || `<tr><td colspan="2">Belum ada data panen pada filter ini.</td></tr>`;
+  applyResponsiveTableLabels();
 }
 
 async function loadPageData(page) {
@@ -751,6 +776,7 @@ function setInitialValues() {
 async function bootstrap() {
   installEvents();
   setInitialValues();
+  applyResponsiveTableLabels();
   await checkSession();
 }
 

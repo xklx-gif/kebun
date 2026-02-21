@@ -93,6 +93,8 @@ small {
   transform: translate(-50%, -50%);
   z-index: 30;
   box-shadow: var(--shadow-lg);
+  max-height: 90vh;
+  overflow: auto;
 }
 
 .landing-view {
@@ -110,16 +112,6 @@ small {
 
 .landing-hero h1 {
   margin-bottom: 0.4rem;
-}
-
-.public-note {
-  display: inline-block;
-  margin-top: 0.45rem;
-  padding: 0.3rem 0.55rem;
-  border-radius: 999px;
-  background: var(--primary-soft);
-  color: #26529d;
-  font-weight: 600;
 }
 
 .landing-actions {
@@ -528,5 +520,67 @@ th {
 
   .login-card {
     width: calc(100% - 1rem);
+  }
+
+  .table-wrap {
+    overflow-x: visible;
+    border: 0;
+    background: transparent;
+  }
+
+  table {
+    min-width: 0;
+    border-collapse: separate;
+    border-spacing: 0 0.55rem;
+  }
+
+  table thead {
+    display: none;
+  }
+
+  table tbody tr {
+    display: block;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    padding: 0.35rem 0.45rem;
+  }
+
+  table tbody td {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.65rem;
+    text-align: right;
+    border-bottom: 1px dashed #e8edf5;
+    padding: 0.55rem 0.2rem;
+  }
+
+  table tbody td::before {
+    content: attr(data-label);
+    color: #4b5e7a;
+    font-weight: 600;
+    text-align: left;
+    max-width: 56%;
+    flex: 1;
+  }
+
+  table tbody td[colspan] {
+    display: block;
+    text-align: left;
+    border-bottom: 0;
+    padding: 0.45rem 0.2rem;
+  }
+
+  table tbody td[colspan]::before {
+    content: none;
+  }
+
+  table tbody tr td:last-child {
+    border-bottom: 0;
+  }
+
+  .row-actions {
+    justify-content: flex-end;
+    flex-wrap: wrap;
   }
 }
