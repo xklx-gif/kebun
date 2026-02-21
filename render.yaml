@@ -8,6 +8,8 @@ services:
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:
+      - key: DATABASE_URL
+        sync: false
       - key: NODE_VERSION
         value: 22
       - key: JWT_SECRET
