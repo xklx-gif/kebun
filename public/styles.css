@@ -368,11 +368,11 @@ button:disabled {
 }
 
 .summary-line.vapor-in {
-  animation: vapor-in 0.45s ease both;
+  animation: vapor-in 0.72s ease both;
 }
 
 .summary-line.vapor-out {
-  animation: vapor-out 0.22s ease both;
+  animation: vapor-out 0.42s ease both;
 }
 
 .summary-box {

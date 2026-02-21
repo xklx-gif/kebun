@@ -47,6 +47,8 @@ const cropFromLabel = Object.fromEntries(
 );
 
 const allowedHarvestUnits = new Set(["kardus", "kontainer"]);
+const SUMMARY_SWAP_DELAY_MS = 420;
+const SUMMARY_ROTATE_INTERVAL_MS = 4600;
 
 function todayISO() {
   const d = new Date();
@@ -156,7 +158,7 @@ function rotateSummaryLine(elementId, isFirst = false) {
     el.classList.remove("vapor-out");
     el.textContent = anim.lines[anim.index];
     showLine();
-  }, 230);
+  }, SUMMARY_SWAP_DELAY_MS);
 }
 
 function startSummaryAnimation(elementId, lines) {
@@ -175,7 +177,7 @@ function startSummaryAnimation(elementId, lines) {
   if (summaryAnimations[elementId].lines.length > 1) {
     summaryAnimations[elementId].timer = setInterval(() => {
       rotateSummaryLine(elementId);
-    }, 2600);
+    }, SUMMARY_ROTATE_INTERVAL_MS);
   }
 }
 
