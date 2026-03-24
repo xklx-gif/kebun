@@ -74,30 +74,6 @@ small {
   margin: 1.3rem auto 2rem;
 }
 
-.shell-header {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0.95rem;
-}
-
-.language-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.7rem 0.85rem;
-}
-
-.language-switch label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: #24416d;
-}
-
-.language-switch select {
-  min-width: 170px;
-}
-
 .card {
   background: var(--bg-1);
   border: 1px solid rgba(16, 28, 44, 0.06);
@@ -176,6 +152,62 @@ small {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.language-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem;
+  background: #edf3ff;
+  border: 1px solid #d3e2ff;
+  border-radius: 999px;
+}
+
+.lang-btn {
+  background: transparent;
+  color: #35517d;
+  padding: 0.45rem 0.8rem;
+  border: 0;
+  box-shadow: none;
+}
+
+.lang-btn:hover {
+  transform: none;
+  box-shadow: none;
+  background: rgba(31, 111, 235, 0.08);
+}
+
+.lang-btn.active {
+  background: #1f6feb;
+  color: #fff;
+}
+
+.menu-section {
+  padding: 0.4rem 0.5rem 0.55rem;
+  border-bottom: 1px solid #edf1f6;
+  margin-bottom: 0.25rem;
+}
+
+.menu-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #5a6d89;
+  margin-bottom: 0.45rem;
+}
+
+.menu-language-group {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.lang-btn-menu {
+  flex: 1 1 0;
+  padding: 0.42rem 0.55rem;
 }
 
 .landing-page {
@@ -609,20 +641,6 @@ th {
     width: calc(100% - 1rem);
   }
 
-  .shell-header {
-    justify-content: stretch;
-  }
-
-  .language-switch {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .language-switch select {
-    min-width: 0;
-    width: 55%;
-  }
-
   .topbar {
     padding: 0.85rem;
   }
@@ -630,6 +648,10 @@ th {
   .landing-hero {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .landing-actions {
+    width: 100%;
   }
 
   .brand-logo {

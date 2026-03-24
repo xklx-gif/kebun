@@ -521,6 +521,8 @@ function applyTranslations() {
       "language.label": { ja: "言語", id: "Bahasa" },
       "language.ja": { ja: "日本語", id: "Bahasa Jepang" },
       "language.id": { ja: "インドネシア語", id: "Bahasa Indonesia" },
+      "language.jaShort": { ja: "日本語", id: "Jepang" },
+      "language.idShort": { ja: "Indonesia", id: "Indonesia" },
       "brand.title": { ja: "Kebun Log Dashboard", id: "Kebun Log Dashboard" },
       "landing.description": { ja: "収穫結果、散布記録、植え付けをリアルタイムで公開表示します。", id: "Monitoring publik hasil panen, pencatatan penyemprotan, dan penanaman secara real-time." },
       "landing.login": { ja: "管理者ログイン", id: "Login Admin" },
@@ -599,7 +601,9 @@ function applyTranslations() {
     node.setAttribute("alt", state.language === "ja" ? "Kebunロゴ" : "Logo Kebun");
   });
 
-  $("language-select").value = state.language;
+  document.querySelectorAll("[data-language]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.language === state.language);
+  });
   $("spray-submit").textContent = $("spray-id").value ? m("updateSpray") : m("saveSpray");
   $("planting-submit").textContent = $("planting-id").value ? m("updatePlanting") : m("savePlanting");
   $("harvest-submit").textContent = $("harvest-id").value ? m("updateHarvest") : m("saveHarvest");
@@ -617,6 +621,7 @@ async function setLanguage(language) {
     localStorage.setItem(LANGUAGE_STORAGE_KEY, state.language);
   } catch {}
   applyTranslations();
+  closeMenu();
   if (state.user) {
     await loadPageData(state.page);
   } else {
@@ -1257,12 +1262,14 @@ async function loadPageData(page) {
 }
 
 function installEvents() {
-  $("language-select").addEventListener("change", (event) => {
-    setLanguage(event.target.value).catch((error) => {
-      if (!state.user) {
-        renderPublicFallback(m("publicUnavailable"));
-      }
-      toast(error.message, true);
+  document.querySelectorAll("[data-language]").forEach((button) => {
+    button.addEventListener("click", () => {
+      setLanguage(button.dataset.language).catch((error) => {
+        if (!state.user) {
+          renderPublicFallback(m("publicUnavailable"));
+        }
+        toast(error.message, true);
+      });
     });
   });
 

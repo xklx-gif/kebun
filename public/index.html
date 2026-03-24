@@ -21,16 +21,6 @@
     <div class="background-shape bg-b"></div>
 
     <main class="shell">
-      <header class="shell-header">
-        <div class="language-switch card">
-          <label for="language-select" data-i18n="language.label">言語</label>
-          <select id="language-select">
-            <option value="ja" data-i18n="language.ja">日本語</option>
-            <option value="id" data-i18n="language.id">Bahasa Indonesia</option>
-          </select>
-        </div>
-      </header>
-
       <section id="landing-view" class="landing-view">
         <header class="card landing-hero">
           <div class="brand-block">
@@ -41,6 +31,10 @@
             </div>
           </div>
           <div class="landing-actions">
+            <div class="language-group" aria-label="Language Switch">
+              <button class="lang-btn" type="button" data-language="ja" data-i18n="language.jaShort">日本語</button>
+              <button class="lang-btn" type="button" data-language="id" data-i18n="language.idShort">Indonesia</button>
+            </div>
             <button id="show-login-btn" class="ghost-btn" type="button" data-i18n="landing.login">管理者ログイン</button>
           </div>
         </header>
@@ -153,6 +147,13 @@
           <div class="menu-wrap">
             <button id="menu-toggle" class="ghost-btn" type="button" aria-label="メニューを開く" data-i18n="menu.button" data-i18n-aria-label="menu.aria">☰ メニュー</button>
             <div id="top-menu" class="menu-dropdown hidden">
+              <div class="menu-section">
+                <p class="menu-label" data-i18n="language.label">言語</p>
+                <div class="language-group menu-language-group">
+                  <button class="lang-btn lang-btn-menu" type="button" data-language="ja" data-i18n="language.jaShort">日本語</button>
+                  <button class="lang-btn lang-btn-menu" type="button" data-language="id" data-i18n="language.idShort">Indonesia</button>
+                </div>
+              </div>
               <button class="menu-link" data-page="dashboard" data-i18n="page.dashboard">ダッシュボード</button>
               <button class="menu-link" data-page="spray" data-i18n="page.spray">散布</button>
               <button class="menu-link" data-page="planting" data-i18n="page.planting">植え付け</button>
