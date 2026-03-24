@@ -3,7 +3,7 @@
   page: "dashboard",
   chart: null,
   publicChart: null,
-  language: getInitialLanguage(),
+  language: "ja",
 };
 
 const DEFAULT_LANGUAGE = "ja";
@@ -1337,6 +1337,7 @@ function setInitialValues() {
 }
 
 async function bootstrap() {
+  state.language = getInitialLanguage();
   applyTranslations();
   installEvents();
   setInitialValues();
