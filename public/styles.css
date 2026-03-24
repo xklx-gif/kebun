@@ -74,6 +74,30 @@ small {
   margin: 1.3rem auto 2rem;
 }
 
+.shell-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.95rem;
+}
+
+.language-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
+}
+
+.language-switch label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #24416d;
+}
+
+.language-switch select {
+  min-width: 170px;
+}
+
 .card {
   background: var(--bg-1);
   border: 1px solid rgba(16, 28, 44, 0.06);
@@ -583,6 +607,20 @@ th {
 @media (max-width: 720px) {
   .shell {
     width: calc(100% - 1rem);
+  }
+
+  .shell-header {
+    justify-content: stretch;
+  }
+
+  .language-switch {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .language-switch select {
+    min-width: 0;
+    width: 55%;
   }
 
   .topbar {

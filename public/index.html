@@ -1,5 +1,5 @@
 ﻿<!doctype html>
-<html lang="id">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,88 +21,98 @@
     <div class="background-shape bg-b"></div>
 
     <main class="shell">
+      <header class="shell-header">
+        <div class="language-switch card">
+          <label for="language-select" data-i18n="language.label">言語</label>
+          <select id="language-select">
+            <option value="ja" data-i18n="language.ja">日本語</option>
+            <option value="id" data-i18n="language.id">Bahasa Indonesia</option>
+          </select>
+        </div>
+      </header>
+
       <section id="landing-view" class="landing-view">
         <header class="card landing-hero">
           <div class="brand-block">
-            <img src="/logo.png" alt="Logo Kebun" class="brand-logo" />
+            <img src="/logo.png" alt="Kebun Logo" class="brand-logo" data-i18n-alt="brand.logoAlt" />
             <div>
-              <h1>Kebun Log Dashboard</h1>
-              <p>Monitoring publik hasil panen, pencatatan penyemprotan, dan penanaman secara real-time.</p>
+              <h1 data-i18n="brand.title">Kebun Log Dashboard</h1>
+              <p data-i18n="landing.description">収穫結果、散布記録、植え付けをリアルタイムで公開表示します。</p>
             </div>
           </div>
           <div class="landing-actions">
-            <button id="show-login-btn" class="ghost-btn" type="button">Login Admin</button>
+            <button id="show-login-btn" class="ghost-btn" type="button" data-i18n="landing.login">管理者ログイン</button>
           </div>
         </header>
 
         <section class="card page landing-page">
           <div class="summary-line-panel">
-            <p id="public-summary-line" class="summary-line">Memuat ringkasan...</p>
+            <p id="public-summary-line" class="summary-line" data-i18n="loading.summary">集計を読み込み中...</p>
           </div>
 
           <article class="landing-panel">
-            <h3>Grafik Panen (14 Hari Terakhir)</h3>
+            <h3 data-i18n="landing.chartTitle">収穫グラフ（直近14日）</h3>
             <div class="chart-wrap public-chart-wrap">
               <canvas id="public-harvest-chart"></canvas>
             </div>
-            <p id="public-chart-note" class="public-chart-note">Memuat grafik panen...</p>
+            <p id="public-chart-note" class="public-chart-note" data-i18n="loading.publicChart">収穫グラフを読み込み中...</p>
           </article>
 
           <div class="landing-data-grid">
             <article class="landing-panel">
-              <h3>Hasil Panen Terbaru</h3>
+              <h3 data-i18n="landing.latestHarvest">最新の収穫結果</h3>
               <div class="table-wrap table-soft">
                 <table>
                   <thead>
                     <tr>
-                      <th>Tanggal</th>
-                      <th>Jenis Panen</th>
-                      <th>Jumlah</th>
-                      <th>Satuan</th>
-                      <th>Tempat</th>
-                      <th>Catatan</th>
+                      <th data-i18n="table.date">日付</th>
+                      <th data-i18n="table.harvestType">収穫種類</th>
+                      <th data-i18n="table.quantity">数量</th>
+                      <th data-i18n="table.unit">単位</th>
+                      <th data-i18n="table.location">場所</th>
+                      <th data-i18n="table.note">メモ</th>
                     </tr>
                   </thead>
                   <tbody id="public-harvest-body">
-                    <tr><td colspan="6">Memuat data panen...</td></tr>
+                    <tr><td colspan="6" data-i18n="loading.harvestData">収穫データを読み込み中...</td></tr>
                   </tbody>
                 </table>
               </div>
             </article>
 
             <article class="landing-panel">
-              <h3>Pencatatan Penyemprotan</h3>
+              <h3 data-i18n="landing.sprayLog">散布記録</h3>
               <div class="table-wrap table-soft">
                 <table>
                   <thead>
                     <tr>
-                      <th>Tanggal</th>
-                      <th>Tanaman</th>
-                      <th>Tempat</th>
-                      <th>Catatan</th>
+                      <th data-i18n="table.date">日付</th>
+                      <th data-i18n="table.crop">作物</th>
+                      <th data-i18n="table.location">場所</th>
+                      <th data-i18n="table.note">メモ</th>
                     </tr>
                   </thead>
                   <tbody id="public-spray-body">
-                    <tr><td colspan="4">Memuat data penyemprotan...</td></tr>
+                    <tr><td colspan="4" data-i18n="loading.sprayData">散布データを読み込み中...</td></tr>
                   </tbody>
                 </table>
               </div>
             </article>
 
             <article class="landing-panel">
-              <h3>Pencatatan Penanaman</h3>
+              <h3 data-i18n="landing.plantingLog">植え付け記録</h3>
               <div class="table-wrap table-soft">
                 <table>
                   <thead>
                     <tr>
-                      <th>Tanggal</th>
-                      <th>Tanaman</th>
-                      <th>Tempat</th>
-                      <th>Catatan</th>
+                      <th data-i18n="table.date">日付</th>
+                      <th data-i18n="table.crop">作物</th>
+                      <th data-i18n="table.location">場所</th>
+                      <th data-i18n="table.note">メモ</th>
                     </tr>
                   </thead>
                   <tbody id="public-planting-body">
-                    <tr><td colspan="4">Memuat data penanaman...</td></tr>
+                    <tr><td colspan="4" data-i18n="loading.plantingData">植え付けデータを読み込み中...</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -113,74 +123,74 @@
 
       <section id="login-view" class="card login-card hidden">
         <div class="login-brand">
-          <img src="/logo.png" alt="Logo Kebun" class="brand-logo login-logo" />
-          <h2>Login Admin</h2>
+          <img src="/logo.png" alt="Kebun Logo" class="brand-logo login-logo" data-i18n-alt="brand.logoAlt" />
+          <h2 data-i18n="login.title">管理者ログイン</h2>
         </div>
-        <p>Masuk untuk mengelola data kebun.</p>
+        <p data-i18n="login.description">畑のデータを管理するにはログインしてください。</p>
         <form id="login-form" class="form-grid">
           <label>
-            Email
+            <span data-i18n="field.email">メール</span>
             <input id="login-email" name="email" type="email" required placeholder="admin@kebun.local" />
           </label>
           <label>
-            Password
+            <span data-i18n="field.password">パスワード</span>
             <input id="login-password" name="password" type="password" required placeholder="******" />
           </label>
-          <button type="submit">Login</button>
-          <button id="hide-login-btn" type="button" class="ghost-btn">Tutup</button>
+          <button type="submit" data-i18n="login.submit">ログイン</button>
+          <button id="hide-login-btn" type="button" class="ghost-btn" data-i18n="action.close">閉じる</button>
         </form>
       </section>
 
       <section id="app-view" class="hidden">
         <header class="topbar card">
           <div class="brand-block topbar-brand">
-            <img src="/logo.png" alt="Logo Kebun" class="brand-logo" />
+            <img src="/logo.png" alt="Kebun Logo" class="brand-logo" data-i18n-alt="brand.logoAlt" />
             <div>
-              <h2>Kebun Log Dashboard</h2>
+              <h2 data-i18n="brand.title">Kebun Log Dashboard</h2>
               <p id="active-user"></p>
             </div>
           </div>
           <div class="menu-wrap">
-            <button id="menu-toggle" class="ghost-btn" type="button" aria-label="Buka menu">☰ Menu</button>
+            <button id="menu-toggle" class="ghost-btn" type="button" aria-label="メニューを開く" data-i18n="menu.button" data-i18n-aria-label="menu.aria">☰ メニュー</button>
             <div id="top-menu" class="menu-dropdown hidden">
-              <button class="menu-link" data-page="dashboard">Dashboard</button>
-              <button class="menu-link" data-page="spray">Penyemprotan</button>
-              <button class="menu-link" data-page="planting">Penanaman</button>
-              <button class="menu-link" data-page="harvest">Panen</button>
-              <button class="menu-link danger" id="logout-btn">Logout</button>
+              <button class="menu-link" data-page="dashboard" data-i18n="page.dashboard">ダッシュボード</button>
+              <button class="menu-link" data-page="spray" data-i18n="page.spray">散布</button>
+              <button class="menu-link" data-page="planting" data-i18n="page.planting">植え付け</button>
+              <button class="menu-link" data-page="harvest" data-i18n="page.harvest">収穫</button>
+              <button class="menu-link danger" id="logout-btn" data-i18n="auth.logout">ログアウト</button>
             </div>
           </div>
         </header>
 
         <nav class="quick-tabs">
-          <button class="tab-btn active" data-page="dashboard">Dashboard</button>
-          <button class="tab-btn" data-page="spray">Penyemprotan</button>
-          <button class="tab-btn" data-page="planting">Penanaman</button>
-          <button class="tab-btn" data-page="harvest">Panen</button>
+          <button class="tab-btn active" data-page="dashboard" data-i18n="page.dashboard">ダッシュボード</button>
+          <button class="tab-btn" data-page="spray" data-i18n="page.spray">散布</button>
+          <button class="tab-btn" data-page="planting" data-i18n="page.planting">植え付け</button>
+          <button class="tab-btn" data-page="harvest" data-i18n="page.harvest">収穫</button>
         </nav>
 
         <section id="page-dashboard" class="page card">
           <div class="summary-line-panel">
-            <p id="summary-line" class="summary-line">Memuat ringkasan...</p>
+            <p id="summary-line" class="summary-line" data-i18n="loading.summary">集計を読み込み中...</p>
           </div>
 
           <article class="dashboard-panel">
             <div class="dashboard-panel-head">
-              <h3>Grafik Panen per Hari</h3>
+              <h3 data-i18n="dashboard.chartTitle">日別収穫グラフ</h3>
               <form id="chart-filter" class="filter-grid chart-filter-grid">
-                <label>Dari <input id="chart-start" type="date" /></label>
-                <label>Sampai <input id="chart-end" type="date" /></label>
+                <label><span data-i18n="filter.from">開始</span><input id="chart-start" type="date" /></label>
+                <label><span data-i18n="filter.to">終了</span><input id="chart-end" type="date" /></label>
                 <label>
-                  Jenis Panen
+                  <span data-i18n="field.harvestType">収穫種類</span>
                   <select id="chart-type">
-                    <option value="ALL">Semua</option>
-                    <option value="HORENSO">Horenso</option>
-                    <option value="TERONG">Terong</option>
-                    <option value="KONYAKU">Konyaku</option>
-                    <option value="KONTENER_HORENSO">Kontener Horenso</option>
+                    <option value="ALL" data-i18n="option.all">すべて</option>
+                    <option value="HORENSO" data-i18n="crop.HORENSO">ほうれん草</option>
+                    <option value="TERONG" data-i18n="crop.TERONG">ナス</option>
+                    <option value="KONYAKU" data-i18n="crop.KONYAKU">こんにゃく</option>
+                    <option value="KONTENER_HORENSO" data-i18n="harvest.KONTENER_HORENSO">ほうれん草コンテナ</option>
                   </select>
                 </label>
-                <button type="submit">Tampilkan</button>
+                <button type="submit" data-i18n="action.show">表示</button>
               </form>
             </div>
             <div class="chart-wrap">
@@ -190,8 +200,8 @@
               <table>
                 <thead id="chart-head">
                   <tr>
-                    <th>Tanggal</th>
-                    <th>Total Jumlah</th>
+                    <th data-i18n="table.date">日付</th>
+                    <th data-i18n="table.totalQuantity">合計数量</th>
                   </tr>
                 </thead>
                 <tbody id="chart-body"></tbody>
@@ -199,17 +209,17 @@
             </div>
           </article>
 
-          <h3>Aktivitas Terbaru</h3>
+          <h3 data-i18n="dashboard.recent">最新アクティビティ</h3>
           <div class="table-wrap table-soft">
             <table>
               <thead>
                 <tr>
-                  <th>Tanggal</th>
-                  <th>Jenis</th>
-                  <th>Detail</th>
-                  <th>Tempat</th>
-                  <th>Catatan</th>
-                  <th>Dibuat Oleh</th>
+                  <th data-i18n="table.date">日付</th>
+                  <th data-i18n="table.type">種類</th>
+                  <th data-i18n="table.detail">詳細</th>
+                  <th data-i18n="table.location">場所</th>
+                  <th data-i18n="table.note">メモ</th>
+                  <th data-i18n="table.createdBy">作成者</th>
                 </tr>
               </thead>
               <tbody id="recent-body"></tbody>
@@ -218,59 +228,59 @@
         </section>
 
         <section id="page-spray" class="page card hidden">
-          <h3>Penyemprotan</h3>
+          <h3 data-i18n="page.spray">散布</h3>
           <form id="spray-form" class="form-grid form-4">
             <input type="hidden" id="spray-id" />
             <label>
-              Catatan
+              <span data-i18n="field.note">メモ</span>
               <input id="spray-note" required />
             </label>
             <label>
-              Tanaman
+              <span data-i18n="field.crop">作物</span>
               <select id="spray-crop" required>
-                <option value="HORENSO">Horenso</option>
-                <option value="TERONG">Terong</option>
-                <option value="KONYAKU">Konyaku</option>
+                <option value="HORENSO" data-i18n="crop.HORENSO">ほうれん草</option>
+                <option value="TERONG" data-i18n="crop.TERONG">ナス</option>
+                <option value="KONYAKU" data-i18n="crop.KONYAKU">こんにゃく</option>
               </select>
             </label>
             <label>
-              Tanggal
+              <span data-i18n="field.date">日付</span>
               <input id="spray-date" type="date" required />
             </label>
             <label>
-              Tempat
+              <span data-i18n="field.location">場所</span>
               <input id="spray-location" required />
             </label>
-            <button type="submit" id="spray-submit">Simpan Penyemprotan</button>
-            <button type="button" id="spray-cancel" class="ghost-btn hidden">Batal Edit</button>
+            <button type="submit" id="spray-submit" data-i18n="spray.save">散布を保存</button>
+            <button type="button" id="spray-cancel" class="ghost-btn hidden" data-i18n="action.cancelEdit">編集をキャンセル</button>
           </form>
 
           <form id="spray-filter" class="filter-grid">
-            <label>Dari <input id="spray-start" type="date" /></label>
-            <label>Sampai <input id="spray-end" type="date" /></label>
+            <label><span data-i18n="filter.from">開始</span><input id="spray-start" type="date" /></label>
+            <label><span data-i18n="filter.to">終了</span><input id="spray-end" type="date" /></label>
             <label>
-              Tanaman
+              <span data-i18n="field.crop">作物</span>
               <select id="spray-filter-crop">
-                <option value="ALL">Semua</option>
-                <option value="HORENSO">Horenso</option>
-                <option value="TERONG">Terong</option>
-                <option value="KONYAKU">Konyaku</option>
+                <option value="ALL" data-i18n="option.all">すべて</option>
+                <option value="HORENSO" data-i18n="crop.HORENSO">ほうれん草</option>
+                <option value="TERONG" data-i18n="crop.TERONG">ナス</option>
+                <option value="KONYAKU" data-i18n="crop.KONYAKU">こんにゃく</option>
               </select>
             </label>
-            <label>Tempat <input id="spray-filter-location" /></label>
-            <button type="submit">Filter</button>
+            <label><span data-i18n="field.location">場所</span><input id="spray-filter-location" /></label>
+            <button type="submit" data-i18n="action.filter">絞り込む</button>
           </form>
 
           <div class="table-wrap table-soft">
             <table>
               <thead>
                 <tr>
-                  <th>Tanggal</th>
-                  <th>Tanaman</th>
-                  <th>Tempat</th>
-                  <th>Catatan</th>
-                  <th>Dibuat Oleh</th>
-                  <th>Aksi</th>
+                  <th data-i18n="table.date">日付</th>
+                  <th data-i18n="table.crop">作物</th>
+                  <th data-i18n="table.location">場所</th>
+                  <th data-i18n="table.note">メモ</th>
+                  <th data-i18n="table.createdBy">作成者</th>
+                  <th data-i18n="table.action">操作</th>
                 </tr>
               </thead>
               <tbody id="spray-body"></tbody>
@@ -279,59 +289,59 @@
         </section>
 
         <section id="page-planting" class="page card hidden">
-          <h3>Penanaman</h3>
+          <h3 data-i18n="page.planting">植え付け</h3>
           <form id="planting-form" class="form-grid form-4">
             <input type="hidden" id="planting-id" />
             <label>
-              Tanaman
+              <span data-i18n="field.crop">作物</span>
               <select id="planting-crop" required>
-                <option value="HORENSO">Horenso</option>
-                <option value="TERONG">Terong</option>
-                <option value="KONYAKU">Konyaku</option>
+                <option value="HORENSO" data-i18n="crop.HORENSO">ほうれん草</option>
+                <option value="TERONG" data-i18n="crop.TERONG">ナス</option>
+                <option value="KONYAKU" data-i18n="crop.KONYAKU">こんにゃく</option>
               </select>
             </label>
             <label>
-              Catatan
+              <span data-i18n="field.note">メモ</span>
               <input id="planting-note" required />
             </label>
             <label>
-              Tempat
+              <span data-i18n="field.location">場所</span>
               <input id="planting-location" required />
             </label>
             <label>
-              Tanggal
+              <span data-i18n="field.date">日付</span>
               <input id="planting-date" type="date" />
             </label>
-            <button type="submit" id="planting-submit">Simpan Penanaman</button>
-            <button type="button" id="planting-cancel" class="ghost-btn hidden">Batal Edit</button>
+            <button type="submit" id="planting-submit" data-i18n="planting.save">植え付けを保存</button>
+            <button type="button" id="planting-cancel" class="ghost-btn hidden" data-i18n="action.cancelEdit">編集をキャンセル</button>
           </form>
 
           <form id="planting-filter" class="filter-grid">
-            <label>Dari <input id="planting-start" type="date" /></label>
-            <label>Sampai <input id="planting-end" type="date" /></label>
+            <label><span data-i18n="filter.from">開始</span><input id="planting-start" type="date" /></label>
+            <label><span data-i18n="filter.to">終了</span><input id="planting-end" type="date" /></label>
             <label>
-              Tanaman
+              <span data-i18n="field.crop">作物</span>
               <select id="planting-filter-crop">
-                <option value="ALL">Semua</option>
-                <option value="HORENSO">Horenso</option>
-                <option value="TERONG">Terong</option>
-                <option value="KONYAKU">Konyaku</option>
+                <option value="ALL" data-i18n="option.all">すべて</option>
+                <option value="HORENSO" data-i18n="crop.HORENSO">ほうれん草</option>
+                <option value="TERONG" data-i18n="crop.TERONG">ナス</option>
+                <option value="KONYAKU" data-i18n="crop.KONYAKU">こんにゃく</option>
               </select>
             </label>
-            <label>Tempat <input id="planting-filter-location" /></label>
-            <button type="submit">Filter</button>
+            <label><span data-i18n="field.location">場所</span><input id="planting-filter-location" /></label>
+            <button type="submit" data-i18n="action.filter">絞り込む</button>
           </form>
 
           <div class="table-wrap table-soft">
             <table>
               <thead>
                 <tr>
-                  <th>Tanggal</th>
-                  <th>Tanaman</th>
-                  <th>Tempat</th>
-                  <th>Catatan</th>
-                  <th>Dibuat Oleh</th>
-                  <th>Aksi</th>
+                  <th data-i18n="table.date">日付</th>
+                  <th data-i18n="table.crop">作物</th>
+                  <th data-i18n="table.location">場所</th>
+                  <th data-i18n="table.note">メモ</th>
+                  <th data-i18n="table.createdBy">作成者</th>
+                  <th data-i18n="table.action">操作</th>
                 </tr>
               </thead>
               <tbody id="planting-body"></tbody>
@@ -340,74 +350,74 @@
         </section>
 
         <section id="page-harvest" class="page card hidden">
-          <h3>Panen</h3>
+          <h3 data-i18n="page.harvest">収穫</h3>
           <form id="harvest-form" class="form-grid form-4">
             <input type="hidden" id="harvest-id" />
             <label>
-              Jenis Panen
+              <span data-i18n="field.harvestType">収穫種類</span>
               <select id="harvest-type" required>
-                <option value="HORENSO">Horenso</option>
-                <option value="TERONG">Terong</option>
-                <option value="KONYAKU">Konyaku</option>
-                <option value="KONTENER_HORENSO">Kontener Horenso</option>
+                <option value="HORENSO" data-i18n="harvest.HORENSO">ほうれん草</option>
+                <option value="TERONG" data-i18n="harvest.TERONG">ナス</option>
+                <option value="KONYAKU" data-i18n="harvest.KONYAKU">こんにゃく</option>
+                <option value="KONTENER_HORENSO" data-i18n="harvest.KONTENER_HORENSO">ほうれん草コンテナ</option>
               </select>
             </label>
             <label>
-              Tanggal
+              <span data-i18n="field.date">日付</span>
               <input id="harvest-date" type="date" required />
             </label>
             <label>
-              Jumlah
+              <span data-i18n="field.quantity">数量</span>
               <input id="harvest-qty" type="number" min="0" step="0.01" required />
             </label>
             <label>
-              Satuan
+              <span data-i18n="field.unit">単位</span>
               <select id="harvest-unit">
-                <option value="kardus">kardus</option>
-                <option value="kontainer">kontainer</option>
+                <option value="kardus" data-i18n="unit.kardus">箱</option>
+                <option value="kontainer" data-i18n="unit.kontainer">コンテナ</option>
               </select>
             </label>
             <label>
-              Tempat
+              <span data-i18n="field.location">場所</span>
               <input id="harvest-location" />
             </label>
             <label>
-              Catatan
+              <span data-i18n="field.note">メモ</span>
               <input id="harvest-note" />
             </label>
-            <button type="submit" id="harvest-submit">Simpan Panen</button>
-            <button type="button" id="harvest-cancel" class="ghost-btn hidden">Batal Edit</button>
+            <button type="submit" id="harvest-submit" data-i18n="harvest.save">収穫を保存</button>
+            <button type="button" id="harvest-cancel" class="ghost-btn hidden" data-i18n="action.cancelEdit">編集をキャンセル</button>
           </form>
 
           <form id="harvest-filter" class="filter-grid">
-            <label>Dari <input id="harvest-start" type="date" /></label>
-            <label>Sampai <input id="harvest-end" type="date" /></label>
+            <label><span data-i18n="filter.from">開始</span><input id="harvest-start" type="date" /></label>
+            <label><span data-i18n="filter.to">終了</span><input id="harvest-end" type="date" /></label>
             <label>
-              Jenis
+              <span data-i18n="field.type">種類</span>
               <select id="harvest-filter-type">
-                <option value="ALL">Semua</option>
-                <option value="HORENSO">Horenso</option>
-                <option value="TERONG">Terong</option>
-                <option value="KONYAKU">Konyaku</option>
-                <option value="KONTENER_HORENSO">Kontener Horenso</option>
+                <option value="ALL" data-i18n="option.all">すべて</option>
+                <option value="HORENSO" data-i18n="harvest.HORENSO">ほうれん草</option>
+                <option value="TERONG" data-i18n="harvest.TERONG">ナス</option>
+                <option value="KONYAKU" data-i18n="harvest.KONYAKU">こんにゃく</option>
+                <option value="KONTENER_HORENSO" data-i18n="harvest.KONTENER_HORENSO">ほうれん草コンテナ</option>
               </select>
             </label>
-            <label>Tempat <input id="harvest-filter-location" /></label>
-            <button type="submit">Filter</button>
+            <label><span data-i18n="field.location">場所</span><input id="harvest-filter-location" /></label>
+            <button type="submit" data-i18n="action.filter">絞り込む</button>
           </form>
 
           <div class="table-wrap table-soft">
             <table>
               <thead>
                 <tr>
-                  <th>Tanggal</th>
-                  <th>Jenis Panen</th>
-                  <th>Jumlah</th>
-                  <th>Satuan</th>
-                  <th>Tempat</th>
-                  <th>Catatan</th>
-                  <th>Dibuat Oleh</th>
-                  <th>Aksi</th>
+                  <th data-i18n="table.date">日付</th>
+                  <th data-i18n="table.harvestType">収穫種類</th>
+                  <th data-i18n="table.quantity">数量</th>
+                  <th data-i18n="table.unit">単位</th>
+                  <th data-i18n="table.location">場所</th>
+                  <th data-i18n="table.note">メモ</th>
+                  <th data-i18n="table.createdBy">作成者</th>
+                  <th data-i18n="table.action">操作</th>
                 </tr>
               </thead>
               <tbody id="harvest-body"></tbody>
@@ -417,7 +427,7 @@
       </section>
     </main>
 
-    <div id="loading" class="loading hidden">Memuat...</div>
+    <div id="loading" class="loading hidden" data-i18n="loading.general">読み込み中...</div>
     <div id="toast" class="toast hidden"></div>
 
     <script type="module" src="app.js"></script>

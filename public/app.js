@@ -3,21 +3,146 @@
   page: "dashboard",
   chart: null,
   publicChart: null,
+  language: getInitialLanguage(),
 };
 
+const DEFAULT_LANGUAGE = "ja";
+const LANGUAGE_STORAGE_KEY = "kebun-language";
+const SUPPORTED_LANGUAGES = new Set(["ja", "id"]);
 const summaryAnimations = {};
 
-const cropLabel = {
-  HORENSO: "Horenso",
-  TERONG: "Terong",
-  KONYAKU: "Konyaku",
+const messages = {
+  ja: {
+    requestFailed: "リクエストに失敗しました。",
+    summaryLoading: "集計を読み込み中...",
+    noData: "データはまだありません。",
+    publicUnavailable: "公開データはまだ有効ではありません。サーバーを再起動してから再読み込みしてください。",
+    loginSuccess: "ログインしました。",
+    logoutSuccess: "ログアウトしました。",
+    sprayCreated: "散布を追加しました。",
+    sprayUpdated: "散布を更新しました。",
+    sprayDeleted: "散布を削除しました。",
+    plantingCreated: "植え付けを追加しました。",
+    plantingUpdated: "植え付けを更新しました。",
+    plantingDeleted: "植え付けを削除しました。",
+    harvestCreated: "収穫データを追加しました。",
+    harvestUpdated: "収穫データを更新しました。",
+    harvestDeleted: "収穫データを削除しました。",
+    confirmDeleteSpray: "この散布データを削除しますか？",
+    confirmDeletePlanting: "この植え付けデータを削除しますか？",
+    confirmDeleteHarvest: "この収穫データを削除しますか？",
+    emailRequired: "メールを入力してください。",
+    passwordRequired: "パスワードを入力してください。",
+    emptySpray: "散布データはまだありません。",
+    emptyPlanting: "植え付けデータはまだありません。",
+    emptyHarvest: "収穫データはまだありません。",
+    emptyRecent: "アクティビティはまだありません。",
+    emptyChart: "この条件では収穫データがありません。",
+    chartNoData: "表示できる収穫データがまだありません。",
+    chartEmptyLabel: "データなし",
+    chartNote: "日別の収穫量を収穫種類ごとに1つのグラフで表示しています。",
+    total: "合計",
+    date: "日付",
+    quantity: "数量",
+    edit: "編集",
+    delete: "削除",
+    saveSpray: "散布を保存",
+    updateSpray: "散布を更新",
+    savePlanting: "植え付けを保存",
+    updatePlanting: "植え付けを更新",
+    saveHarvest: "収穫を保存",
+    updateHarvest: "収穫を更新",
+    summarySpray: "本日の散布: {value}",
+    summaryPlanting: "本日の植え付け: {value}",
+    summaryHarvestToday: "本日の収穫合計: {value}",
+    summaryHarvestWeek: "直近7日間の収穫合計: {value}",
+    quantityLabel: "{label}の数量",
+  },
+  id: {
+    requestFailed: "Request gagal.",
+    summaryLoading: "Memuat ringkasan...",
+    noData: "Data belum tersedia.",
+    publicUnavailable: "Data publik belum aktif. Restart server lalu refresh halaman.",
+    loginSuccess: "Login berhasil.",
+    logoutSuccess: "Logout berhasil.",
+    sprayCreated: "Penyemprotan ditambahkan.",
+    sprayUpdated: "Penyemprotan diperbarui.",
+    sprayDeleted: "Penyemprotan dihapus.",
+    plantingCreated: "Penanaman ditambahkan.",
+    plantingUpdated: "Penanaman diperbarui.",
+    plantingDeleted: "Penanaman dihapus.",
+    harvestCreated: "Data panen ditambahkan.",
+    harvestUpdated: "Data panen diperbarui.",
+    harvestDeleted: "Data panen dihapus.",
+    confirmDeleteSpray: "Hapus data penyemprotan ini?",
+    confirmDeletePlanting: "Hapus data penanaman ini?",
+    confirmDeleteHarvest: "Hapus data panen ini?",
+    emailRequired: "Email wajib diisi.",
+    passwordRequired: "Password wajib diisi.",
+    emptySpray: "Belum ada data penyemprotan.",
+    emptyPlanting: "Belum ada data penanaman.",
+    emptyHarvest: "Belum ada data panen.",
+    emptyRecent: "Belum ada aktivitas.",
+    emptyChart: "Belum ada data panen pada filter ini.",
+    chartNoData: "Belum ada data panen untuk ditampilkan.",
+    chartEmptyLabel: "Belum ada data",
+    chartNote: "Panen harian ditampilkan terpisah per jenis panen dalam satu grafik.",
+    total: "Total",
+    date: "Tanggal",
+    quantity: "Jumlah",
+    edit: "Edit",
+    delete: "Hapus",
+    saveSpray: "Simpan Penyemprotan",
+    updateSpray: "Update Penyemprotan",
+    savePlanting: "Simpan Penanaman",
+    updatePlanting: "Update Penanaman",
+    saveHarvest: "Simpan Panen",
+    updateHarvest: "Update Panen",
+    summarySpray: "Penyemprotan hari ini: {value}",
+    summaryPlanting: "Penanaman hari ini: {value}",
+    summaryHarvestToday: "Total panen hari ini: {value}",
+    summaryHarvestWeek: "Total panen 7 hari: {value}",
+    quantityLabel: "Jumlah {label}",
+  },
 };
 
-const harvestLabel = {
-  HORENSO: "Horenso",
-  TERONG: "Terong",
-  KONYAKU: "Konyaku",
-  KONTENER_HORENSO: "Kontener Horenso",
+const cropLabelMap = {
+  ja: {
+    HORENSO: "ほうれん草",
+    TERONG: "ナス",
+    KONYAKU: "こんにゃく",
+  },
+  id: {
+    HORENSO: "Horenso",
+    TERONG: "Terong",
+    KONYAKU: "Konyaku",
+  },
+};
+
+const harvestLabelMap = {
+  ja: {
+    HORENSO: "ほうれん草",
+    TERONG: "ナス",
+    KONYAKU: "こんにゃく",
+    KONTENER_HORENSO: "ほうれん草コンテナ",
+  },
+  id: {
+    HORENSO: "Horenso",
+    TERONG: "Terong",
+    KONYAKU: "Konyaku",
+    KONTENER_HORENSO: "Kontener Horenso",
+  },
+};
+
+const unitLabelMap = {
+  ja: {
+    kardus: "箱",
+    kontainer: "コンテナ",
+  },
+  id: {
+    kardus: "kardus",
+    kontainer: "kontainer",
+  },
 };
 
 const harvestTypes = ["HORENSO", "TERONG", "KONYAKU", "KONTENER_HORENSO"];
@@ -42,13 +167,115 @@ const harvestChartStyle = {
 
 const $ = (id) => document.getElementById(id);
 
-const cropFromLabel = Object.fromEntries(
-  Object.entries(cropLabel).map(([code, label]) => [label.toLowerCase(), code])
-);
+const cropFromLabel = createLookup(cropLabelMap);
+const harvestFromLabel = createLookup(harvestLabelMap);
+const unitFromLabel = {
+  kardus: "kardus",
+  kontainer: "kontainer",
+  box: "kardus",
+  container: "kontainer",
+  "箱": "kardus",
+  "コンテナ": "kontainer",
+};
 
 const allowedHarvestUnits = new Set(["kardus", "kontainer"]);
 const SUMMARY_SWAP_DELAY_MS = 420;
 const SUMMARY_ROTATE_INTERVAL_MS = 4600;
+
+function getInitialLanguage() {
+  try {
+    const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (SUPPORTED_LANGUAGES.has(saved)) {
+      return saved;
+    }
+  } catch {}
+  return DEFAULT_LANGUAGE;
+}
+
+function createLookup(labelSets) {
+  const lookup = {};
+  Object.values(labelSets).forEach((set) => {
+    Object.entries(set).forEach(([code, label]) => {
+      lookup[String(label).toLowerCase()] = code;
+    });
+  });
+  Object.keys(labelSets[DEFAULT_LANGUAGE] || {}).forEach((code) => {
+    lookup[code.toLowerCase()] = code;
+  });
+  return lookup;
+}
+
+function m(key, params = {}) {
+  let text = messages[state.language]?.[key] || messages[DEFAULT_LANGUAGE]?.[key] || key;
+  Object.entries(params).forEach(([name, value]) => {
+    text = text.replaceAll(`{${name}}`, String(value));
+  });
+  return text;
+}
+
+function cropLabel(code) {
+  return cropLabelMap[state.language]?.[code] || cropLabelMap[DEFAULT_LANGUAGE]?.[code] || code;
+}
+
+function harvestLabel(code) {
+  return harvestLabelMap[state.language]?.[code] || harvestLabelMap[DEFAULT_LANGUAGE]?.[code] || code;
+}
+
+function unitLabel(unit) {
+  return unitLabelMap[state.language]?.[unit] || unitLabelMap[DEFAULT_LANGUAGE]?.[unit] || unit;
+}
+
+function roleLabel(role) {
+  const labels = {
+    ADMIN: { ja: "管理者", id: "Admin" },
+    STAFF: { ja: "スタッフ", id: "Staff" },
+  };
+  return labels[role]?.[state.language] || role;
+}
+
+function activityLabel(type) {
+  const labels = {
+    PANEN: { ja: "収穫", id: "Panen" },
+    HARVEST: { ja: "収穫", id: "Panen" },
+    PENYEMPROTAN: { ja: "散布", id: "Penyemprotan" },
+    SPRAY: { ja: "散布", id: "Penyemprotan" },
+    PENANAMAN: { ja: "植え付け", id: "Penanaman" },
+    PLANTING: { ja: "植え付け", id: "Penanaman" },
+  };
+  return labels[type]?.[state.language] || type;
+}
+
+function translateServerMessage(message) {
+  const map = {
+    "Belum login.": { ja: "ログインしていません。", id: "Belum login." },
+    "Sesi tidak valid. Silakan login lagi.": { ja: "セッションが無効です。もう一度ログインしてください。", id: "Sesi tidak valid. Silakan login lagi." },
+    "Format startDate tidak valid.": { ja: "startDate の形式が正しくありません。", id: "Format startDate tidak valid." },
+    "Format endDate tidak valid.": { ja: "endDate の形式が正しくありません。", id: "Format endDate tidak valid." },
+    "Jenis panen tidak valid.": { ja: "収穫種類が正しくありません。", id: "Jenis panen tidak valid." },
+    "Format email tidak valid.": { ja: "メール形式が正しくありません。", id: "Format email tidak valid." },
+    "Password wajib diisi.": { ja: "パスワードを入力してください。", id: "Password wajib diisi." },
+    "Email atau password salah.": { ja: "メールまたはパスワードが間違っています。", id: "Email atau password salah." },
+    "Nilai crop tidak valid.": { ja: "作物の値が正しくありません。", id: "Nilai crop tidak valid." },
+    "Catatan wajib diisi.": { ja: "メモを入力してください。", id: "Catatan wajib diisi." },
+    "Tanaman wajib Horenso, Terong, atau Konyaku.": { ja: "作物は Horenso、Terong、Konyaku のいずれかである必要があります。", id: "Tanaman wajib Horenso, Terong, atau Konyaku." },
+    "Tanggal wajib diisi dengan format YYYY-MM-DD.": { ja: "日付は YYYY-MM-DD 形式で入力してください。", id: "Tanggal wajib diisi dengan format YYYY-MM-DD." },
+    "Tempat wajib diisi.": { ja: "場所を入力してください。", id: "Tempat wajib diisi." },
+    "ID tidak valid.": { ja: "ID が正しくありません。", id: "ID tidak valid." },
+    "Field spray tidak lengkap atau tidak valid.": { ja: "散布データが不足しているか正しくありません。", id: "Field spray tidak lengkap atau tidak valid." },
+    "Data tidak ditemukan.": { ja: "データが見つかりません。", id: "Data tidak ditemukan." },
+    "Tanggal wajib valid.": { ja: "有効な日付を入力してください。", id: "Tanggal wajib valid." },
+    "Field penanaman tidak lengkap atau tidak valid.": { ja: "植え付けデータが不足しているか正しくありません。", id: "Field penanaman tidak lengkap atau tidak valid." },
+    "Jumlah wajib angka >= 0.": { ja: "数量は 0 以上の数値である必要があります。", id: "Jumlah wajib angka >= 0." },
+    "Satuan panen harus kardus atau kontainer.": { ja: "収穫単位は kardus または kontainer である必要があります。", id: "Satuan panen harus kardus atau kontainer." },
+    "Field panen tidak lengkap atau tidak valid.": { ja: "収穫データが不足しているか正しくありません。", id: "Field panen tidak lengkap atau tidak valid." },
+    "Terjadi kesalahan server.": { ja: "サーバーエラーが発生しました。", id: "Terjadi kesalahan server." },
+  };
+  return map[message]?.[state.language] || message || m("requestFailed");
+}
+
+function formatActiveUser(user) {
+  return `${user.name} (${roleLabel(user.role)})`;
+}
 
 function todayISO() {
   const d = new Date();
@@ -96,7 +323,7 @@ async function api(url, options = {}) {
     const body = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      throw new Error(body.message || "Request gagal.");
+      throw new Error(translateServerMessage(body.message));
     }
 
     return body;
@@ -107,10 +334,10 @@ async function api(url, options = {}) {
 
 function getSummaryLines(summary) {
   return [
-    `Penyemprotan hari ini: ${summary.sprayToday}`,
-    `Penanaman hari ini: ${summary.plantingToday}`,
-    `Total panen hari ini: ${summary.harvestToday}`,
-    `Total panen 7 hari: ${summary.harvestWeek}`,
+    m("summarySpray", { value: summary.sprayToday }),
+    m("summaryPlanting", { value: summary.plantingToday }),
+    m("summaryHarvestToday", { value: summary.harvestToday }),
+    m("summaryHarvestWeek", { value: summary.harvestWeek }),
   ];
 }
 
@@ -182,7 +409,7 @@ function startSummaryAnimation(elementId, lines) {
 }
 
 function renderPublicFallback(message) {
-  const fallback = message || "Data belum tersedia.";
+  const fallback = message || m("noData");
   setSummaryFallback("public-summary-line", fallback);
   $("public-spray-body").innerHTML = `<tr><td colspan="4">${fallback}</td></tr>`;
   $("public-planting-body").innerHTML = `<tr><td colspan="4">${fallback}</td></tr>`;
@@ -193,7 +420,7 @@ function renderPublicFallback(message) {
 
 function requireValue(value, name) {
   if (!String(value || "").trim()) {
-    throw new Error(`${name} wajib diisi.`);
+    throw new Error(name);
   }
 }
 
@@ -226,6 +453,14 @@ function cropCodeFromCellText(text) {
   return cropFromLabel[String(text || "").trim().toLowerCase()] || "HORENSO";
 }
 
+function harvestCodeFromCellText(text) {
+  return harvestFromLabel[String(text || "").trim().toLowerCase()] || "HORENSO";
+}
+
+function unitCodeFromCellText(text) {
+  return unitFromLabel[String(text || "").trim().toLowerCase()] || "kardus";
+}
+
 function setPage(page) {
   state.page = page;
   ["dashboard", "spray", "planting", "harvest"].forEach((name) => {
@@ -242,8 +477,8 @@ function setPage(page) {
 
 function actionButtons(id, kind) {
   return `<div class="row-actions">
-      <button class="action-btn" data-action="edit" data-id="${id}" data-kind="${kind}">Edit</button>
-      <button class="action-btn delete" data-action="delete" data-id="${id}" data-kind="${kind}">Hapus</button>
+      <button class="action-btn" data-action="edit" data-id="${id}" data-kind="${kind}">${m("edit")}</button>
+      <button class="action-btn delete" data-action="delete" data-id="${id}" data-kind="${kind}">${m("delete")}</button>
     </div>`;
 }
 
@@ -276,11 +511,124 @@ function applyResponsiveTableLabels() {
   });
 }
 
+function applyTranslations() {
+  document.documentElement.lang = state.language;
+  document.title = "Kebun Log Dashboard";
+
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    const key = node.dataset.i18n;
+    const table = {
+      "language.label": { ja: "言語", id: "Bahasa" },
+      "language.ja": { ja: "日本語", id: "Bahasa Jepang" },
+      "language.id": { ja: "インドネシア語", id: "Bahasa Indonesia" },
+      "brand.title": { ja: "Kebun Log Dashboard", id: "Kebun Log Dashboard" },
+      "landing.description": { ja: "収穫結果、散布記録、植え付けをリアルタイムで公開表示します。", id: "Monitoring publik hasil panen, pencatatan penyemprotan, dan penanaman secara real-time." },
+      "landing.login": { ja: "管理者ログイン", id: "Login Admin" },
+      "loading.summary": { ja: "集計を読み込み中...", id: "Memuat ringkasan..." },
+      "landing.chartTitle": { ja: "収穫グラフ（直近14日）", id: "Grafik Panen (14 Hari Terakhir)" },
+      "loading.publicChart": { ja: "収穫グラフを読み込み中...", id: "Memuat grafik panen..." },
+      "landing.latestHarvest": { ja: "最新の収穫結果", id: "Hasil Panen Terbaru" },
+      "landing.sprayLog": { ja: "散布記録", id: "Pencatatan Penyemprotan" },
+      "landing.plantingLog": { ja: "植え付け記録", id: "Pencatatan Penanaman" },
+      "table.date": { ja: "日付", id: "Tanggal" },
+      "table.harvestType": { ja: "収穫種類", id: "Jenis Panen" },
+      "table.quantity": { ja: "数量", id: "Jumlah" },
+      "table.unit": { ja: "単位", id: "Satuan" },
+      "table.location": { ja: "場所", id: "Tempat" },
+      "table.note": { ja: "メモ", id: "Catatan" },
+      "table.crop": { ja: "作物", id: "Tanaman" },
+      "login.title": { ja: "管理者ログイン", id: "Login Admin" },
+      "login.description": { ja: "畑のデータを管理するにはログインしてください。", id: "Masuk untuk mengelola data kebun." },
+      "field.email": { ja: "メール", id: "Email" },
+      "field.password": { ja: "パスワード", id: "Password" },
+      "login.submit": { ja: "ログイン", id: "Login" },
+      "action.close": { ja: "閉じる", id: "Tutup" },
+      "menu.button": { ja: "☰ メニュー", id: "☰ Menu" },
+      "page.dashboard": { ja: "ダッシュボード", id: "Dashboard" },
+      "page.spray": { ja: "散布", id: "Penyemprotan" },
+      "page.planting": { ja: "植え付け", id: "Penanaman" },
+      "page.harvest": { ja: "収穫", id: "Panen" },
+      "auth.logout": { ja: "ログアウト", id: "Logout" },
+      "dashboard.chartTitle": { ja: "日別収穫グラフ", id: "Grafik Panen per Hari" },
+      "filter.from": { ja: "開始", id: "Dari" },
+      "filter.to": { ja: "終了", id: "Sampai" },
+      "field.harvestType": { ja: "収穫種類", id: "Jenis Panen" },
+      "option.all": { ja: "すべて", id: "Semua" },
+      "crop.HORENSO": { ja: "ほうれん草", id: "Horenso" },
+      "crop.TERONG": { ja: "ナス", id: "Terong" },
+      "crop.KONYAKU": { ja: "こんにゃく", id: "Konyaku" },
+      "harvest.KONTENER_HORENSO": { ja: "ほうれん草コンテナ", id: "Kontener Horenso" },
+      "action.show": { ja: "表示", id: "Tampilkan" },
+      "table.totalQuantity": { ja: "合計数量", id: "Total Jumlah" },
+      "dashboard.recent": { ja: "最新アクティビティ", id: "Aktivitas Terbaru" },
+      "table.type": { ja: "種類", id: "Jenis" },
+      "table.detail": { ja: "詳細", id: "Detail" },
+      "table.createdBy": { ja: "作成者", id: "Dibuat Oleh" },
+      "field.crop": { ja: "作物", id: "Tanaman" },
+      "field.note": { ja: "メモ", id: "Catatan" },
+      "field.date": { ja: "日付", id: "Tanggal" },
+      "field.location": { ja: "場所", id: "Tempat" },
+      "action.cancelEdit": { ja: "編集をキャンセル", id: "Batal Edit" },
+      "action.filter": { ja: "絞り込む", id: "Filter" },
+      "table.action": { ja: "操作", id: "Aksi" },
+      "field.quantity": { ja: "数量", id: "Jumlah" },
+      "field.unit": { ja: "単位", id: "Satuan" },
+      "unit.kardus": { ja: "箱", id: "kardus" },
+      "unit.kontainer": { ja: "コンテナ", id: "kontainer" },
+      "field.type": { ja: "種類", id: "Jenis" },
+      "loading.general": { ja: "読み込み中...", id: "Memuat..." },
+      "loading.harvestData": { ja: "収穫データを読み込み中...", id: "Memuat data panen..." },
+      "loading.sprayData": { ja: "散布データを読み込み中...", id: "Memuat data penyemprotan..." },
+      "loading.plantingData": { ja: "植え付けデータを読み込み中...", id: "Memuat data penanaman..." },
+      "harvest.HORENSO": { ja: "ほうれん草", id: "Horenso" },
+      "harvest.TERONG": { ja: "ナス", id: "Terong" },
+      "harvest.KONYAKU": { ja: "こんにゃく", id: "Konyaku" },
+    };
+    if (table[key]) {
+      node.textContent = table[key][state.language];
+    }
+  });
+
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((node) => {
+    if (node.dataset.i18nAriaLabel === "menu.aria") {
+      node.setAttribute("aria-label", state.language === "ja" ? "メニューを開く" : "Buka menu");
+    }
+  });
+
+  document.querySelectorAll("[data-i18n-alt]").forEach((node) => {
+    node.setAttribute("alt", state.language === "ja" ? "Kebunロゴ" : "Logo Kebun");
+  });
+
+  $("language-select").value = state.language;
+  $("spray-submit").textContent = $("spray-id").value ? m("updateSpray") : m("saveSpray");
+  $("planting-submit").textContent = $("planting-id").value ? m("updatePlanting") : m("savePlanting");
+  $("harvest-submit").textContent = $("harvest-id").value ? m("updateHarvest") : m("saveHarvest");
+
+  if (state.user) {
+    $("active-user").textContent = formatActiveUser(state.user);
+  }
+
+  applyResponsiveTableLabels();
+}
+
+async function setLanguage(language) {
+  state.language = SUPPORTED_LANGUAGES.has(language) ? language : DEFAULT_LANGUAGE;
+  try {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, state.language);
+  } catch {}
+  applyTranslations();
+  if (state.user) {
+    await loadPageData(state.page);
+  } else {
+    await loadPublicLanding();
+  }
+}
+
 async function checkSession() {
   try {
     const result = await api("/api/auth/me");
     state.user = result.user;
-    $("active-user").textContent = `${result.user.name} (${result.user.role})`;
+    $("active-user").textContent = formatActiveUser(result.user);
     setModeAuthenticated(true);
     await loadPageData("dashboard");
   } catch {
@@ -289,7 +637,7 @@ async function checkSession() {
     try {
       await loadPublicLanding();
     } catch (error) {
-      renderPublicFallback("Data publik belum aktif. Restart server lalu refresh halaman.");
+      renderPublicFallback(m("publicUnavailable"));
       toast(error.message, true);
     }
   }
@@ -301,8 +649,8 @@ async function onLogin(event) {
   const password = $("login-password").value;
 
   try {
-    requireValue(email, "Email");
-    requireValue(password, "Password");
+    requireValue(email, m("emailRequired"));
+    requireValue(password, m("passwordRequired"));
 
     const result = await api("/api/auth/login", {
       method: "POST",
@@ -310,10 +658,10 @@ async function onLogin(event) {
     });
 
     state.user = result.user;
-    $("active-user").textContent = `${result.user.name} (${result.user.role})`;
+    $("active-user").textContent = formatActiveUser(result.user);
     setModeAuthenticated(true);
     $("login-form").reset();
-    toast("Login berhasil.");
+    toast(m("loginSuccess"));
     await loadPageData("dashboard");
   } catch (error) {
     toast(error.message, true);
@@ -327,7 +675,7 @@ async function onLogout() {
     setModeAuthenticated(false);
     $("login-form").reset();
     await loadPublicLanding();
-    toast("Logout berhasil.");
+    toast(m("logoutSuccess"));
   } catch (error) {
     toast(error.message, true);
   }
@@ -350,46 +698,46 @@ async function loadPublicLanding() {
     .map(
       (item) => `<tr>
       <td>${item.date}</td>
-      <td>${cropLabel[item.crop] || item.crop}</td>
+      <td>${cropLabel(item.crop)}</td>
       <td>${item.location || "-"}</td>
       <td>${item.note || "-"}</td>
     </tr>`
     )
     .join("");
-  $("public-spray-body").innerHTML = sprayHtml || `<tr><td colspan="4">Belum ada data penyemprotan.</td></tr>`;
+  $("public-spray-body").innerHTML = sprayHtml || `<tr><td colspan="4">${m("emptySpray")}</td></tr>`;
 
   const plantingHtml = plantings.items
     .map(
       (item) => `<tr>
       <td>${item.date}</td>
-      <td>${cropLabel[item.crop] || item.crop}</td>
+      <td>${cropLabel(item.crop)}</td>
       <td>${item.location || "-"}</td>
       <td>${item.note || "-"}</td>
     </tr>`
     )
     .join("");
-  $("public-planting-body").innerHTML = plantingHtml || `<tr><td colspan="4">Belum ada data penanaman.</td></tr>`;
+  $("public-planting-body").innerHTML = plantingHtml || `<tr><td colspan="4">${m("emptyPlanting")}</td></tr>`;
 
   const harvestHtml = harvests.items
     .map(
       (item) => `<tr>
       <td>${item.date}</td>
-      <td>${harvestLabel[item.harvest_type] || item.harvest_type}</td>
+      <td>${harvestLabel(item.harvest_type)}</td>
       <td>${item.qty}</td>
-      <td>${item.unit}</td>
+      <td>${unitLabel(item.unit)}</td>
       <td>${item.location || "-"}</td>
       <td>${item.note || "-"}</td>
     </tr>`
     )
     .join("");
-  $("public-harvest-body").innerHTML = harvestHtml || `<tr><td colspan="6">Belum ada data panen.</td></tr>`;
+  $("public-harvest-body").innerHTML = harvestHtml || `<tr><td colspan="6">${m("emptyHarvest")}</td></tr>`;
 
   const labels = chartSeries.labels || [];
   const lineDatasets = harvestTypes.map((harvestType) => {
     const style = harvestChartStyle[harvestType];
     const byDate = chartSeries.dateMaps?.[harvestType] || new Map();
     return {
-      label: harvestLabel[harvestType] || harvestType,
+      label: harvestLabel(harvestType),
       data: labels.map((date) => byDate.get(date) || 0),
       borderColor: style.border,
       backgroundColor: style.background,
@@ -399,12 +747,10 @@ async function loadPublicLanding() {
     };
   });
 
-  const chartLabels = labels.length ? labels : ["Belum ada data"];
+  const chartLabels = labels.length ? labels : [m("chartEmptyLabel")];
   const chartDatasets = labels.length ? lineDatasets : lineDatasets.map((dataset) => ({ ...dataset, data: [0] }));
   renderPublicChart(chartLabels, chartDatasets);
-  $("public-chart-note").textContent = labels.length
-    ? "Panen harian ditampilkan terpisah per jenis panen dalam satu grafik."
-    : "Belum ada data panen untuk ditampilkan.";
+  $("public-chart-note").textContent = labels.length ? m("chartNote") : m("chartNoData");
   applyResponsiveTableLabels();
 }
 
@@ -442,11 +788,12 @@ async function loadDashboard() {
 
   const html = recent.items
     .map((item) => {
-      const detail = item.activity_type === "PANEN" ? harvestLabel[item.detail] || item.detail : cropLabel[item.detail] || item.detail;
-      const note = item.qty !== null && item.qty !== undefined ? `${item.qty} ${item.unit} | ${item.note || "-"}` : item.note || "-";
+      const isHarvest = item.activity_type === "PANEN" || item.activity_type === "HARVEST";
+      const detail = isHarvest ? harvestLabel(item.detail) : cropLabel(item.detail);
+      const note = item.qty !== null && item.qty !== undefined ? `${item.qty} ${unitLabel(item.unit)} | ${item.note || "-"}` : item.note || "-";
       return `<tr>
         <td>${item.date}</td>
-        <td>${item.activity_type}</td>
+        <td>${activityLabel(item.activity_type)}</td>
         <td>${detail}</td>
         <td>${item.location || "-"}</td>
         <td>${note}</td>
@@ -455,7 +802,7 @@ async function loadDashboard() {
     })
     .join("");
 
-  $("recent-body").innerHTML = html || `<tr><td colspan="6">Belum ada aktivitas.</td></tr>`;
+  $("recent-body").innerHTML = html || `<tr><td colspan="6">${m("emptyRecent")}</td></tr>`;
   applyResponsiveTableLabels();
 }
 
@@ -469,7 +816,7 @@ function resetSprayForm() {
   $("spray-id").value = "";
   $("spray-form").reset();
   $("spray-date").value = todayISO();
-  $("spray-submit").textContent = "Simpan Penyemprotan";
+  $("spray-submit").textContent = m("saveSpray");
   $("spray-cancel").classList.add("hidden");
 }
 
@@ -485,7 +832,7 @@ async function loadSprays() {
     .map(
       (item) => `<tr>
       <td>${item.date}</td>
-      <td>${cropLabel[item.crop] || item.crop}</td>
+      <td>${cropLabel(item.crop)}</td>
       <td>${item.location}</td>
       <td>${item.note}</td>
       <td>${item.created_by_name}</td>
@@ -493,7 +840,7 @@ async function loadSprays() {
     </tr>`
     )
     .join("");
-  $("spray-body").innerHTML = html || `<tr><td colspan="6">Belum ada data penyemprotan.</td></tr>`;
+  $("spray-body").innerHTML = html || `<tr><td colspan="6">${m("emptySpray")}</td></tr>`;
   applyResponsiveTableLabels();
 }
 
@@ -510,10 +857,10 @@ async function submitSpray(event) {
   try {
     if (id) {
       await api(`/api/sprays/${id}`, { method: "PUT", body: JSON.stringify(payload) });
-      toast("Penyemprotan diperbarui.");
+      toast(m("sprayUpdated"));
     } else {
       await api("/api/sprays", { method: "POST", body: JSON.stringify(payload) });
-      toast("Penyemprotan ditambahkan.");
+      toast(m("sprayCreated"));
     }
     resetSprayForm();
     await Promise.all([loadSprays(), loadDashboard()]);
@@ -530,12 +877,12 @@ async function onSprayAction(event) {
 
   const id = button.dataset.id;
   if (button.dataset.action === "delete") {
-    if (!confirm("Hapus data penyemprotan ini?")) {
+    if (!confirm(m("confirmDeleteSpray"))) {
       return;
     }
     try {
       await api(`/api/sprays/${id}`, { method: "DELETE" });
-      toast("Penyemprotan dihapus.");
+      toast(m("sprayDeleted"));
       await Promise.all([loadSprays(), loadDashboard()]);
     } catch (error) {
       toast(error.message, true);
@@ -549,7 +896,7 @@ async function onSprayAction(event) {
   $("spray-crop").value = cropCodeFromCellText(row.children[1].textContent);
   $("spray-location").value = row.children[2].textContent;
   $("spray-note").value = row.children[3].textContent;
-  $("spray-submit").textContent = "Update Penyemprotan";
+  $("spray-submit").textContent = m("updateSpray");
   $("spray-cancel").classList.remove("hidden");
 }
 
@@ -557,7 +904,7 @@ function resetPlantingForm() {
   $("planting-id").value = "";
   $("planting-form").reset();
   $("planting-date").value = todayISO();
-  $("planting-submit").textContent = "Simpan Penanaman";
+  $("planting-submit").textContent = m("savePlanting");
   $("planting-cancel").classList.add("hidden");
 }
 
@@ -573,7 +920,7 @@ async function loadPlantings() {
     .map(
       (item) => `<tr>
       <td>${item.date}</td>
-      <td>${cropLabel[item.crop] || item.crop}</td>
+      <td>${cropLabel(item.crop)}</td>
       <td>${item.location}</td>
       <td>${item.note}</td>
       <td>${item.created_by_name}</td>
@@ -581,7 +928,7 @@ async function loadPlantings() {
     </tr>`
     )
     .join("");
-  $("planting-body").innerHTML = html || `<tr><td colspan="6">Belum ada data penanaman.</td></tr>`;
+  $("planting-body").innerHTML = html || `<tr><td colspan="6">${m("emptyPlanting")}</td></tr>`;
   applyResponsiveTableLabels();
 }
 
@@ -598,10 +945,10 @@ async function submitPlanting(event) {
   try {
     if (id) {
       await api(`/api/plantings/${id}`, { method: "PUT", body: JSON.stringify(payload) });
-      toast("Penanaman diperbarui.");
+      toast(m("plantingUpdated"));
     } else {
       await api("/api/plantings", { method: "POST", body: JSON.stringify(payload) });
-      toast("Penanaman ditambahkan.");
+      toast(m("plantingCreated"));
     }
     resetPlantingForm();
     await Promise.all([loadPlantings(), loadDashboard()]);
@@ -618,12 +965,12 @@ async function onPlantingAction(event) {
 
   const id = button.dataset.id;
   if (button.dataset.action === "delete") {
-    if (!confirm("Hapus data penanaman ini?")) {
+    if (!confirm(m("confirmDeletePlanting"))) {
       return;
     }
     try {
       await api(`/api/plantings/${id}`, { method: "DELETE" });
-      toast("Penanaman dihapus.");
+      toast(m("plantingDeleted"));
       await Promise.all([loadPlantings(), loadDashboard()]);
     } catch (error) {
       toast(error.message, true);
@@ -637,7 +984,7 @@ async function onPlantingAction(event) {
   $("planting-crop").value = cropCodeFromCellText(row.children[1].textContent);
   $("planting-location").value = row.children[2].textContent;
   $("planting-note").value = row.children[3].textContent;
-  $("planting-submit").textContent = "Update Penanaman";
+  $("planting-submit").textContent = m("updatePlanting");
   $("planting-cancel").classList.remove("hidden");
 }
 
@@ -660,7 +1007,7 @@ function resetHarvestForm() {
   $("harvest-form").reset();
   $("harvest-date").value = todayISO();
   $("harvest-unit").value = "kardus";
-  $("harvest-submit").textContent = "Simpan Panen";
+  $("harvest-submit").textContent = m("saveHarvest");
   $("harvest-cancel").classList.add("hidden");
   syncHarvestUnitByType();
 }
@@ -677,9 +1024,9 @@ async function loadHarvests() {
     .map(
       (item) => `<tr>
       <td>${item.date}</td>
-      <td>${harvestLabel[item.harvest_type] || item.harvest_type}</td>
+      <td>${harvestLabel(item.harvest_type)}</td>
       <td>${item.qty}</td>
-      <td>${item.unit}</td>
+      <td>${unitLabel(item.unit)}</td>
       <td>${item.location || "-"}</td>
       <td>${item.note || "-"}</td>
       <td>${item.created_by_name}</td>
@@ -687,7 +1034,7 @@ async function loadHarvests() {
     </tr>`
     )
     .join("");
-  $("harvest-body").innerHTML = html || `<tr><td colspan="8">Belum ada data panen.</td></tr>`;
+  $("harvest-body").innerHTML = html || `<tr><td colspan="8">${m("emptyHarvest")}</td></tr>`;
   applyResponsiveTableLabels();
 }
 
@@ -706,10 +1053,10 @@ async function submitHarvest(event) {
   try {
     if (id) {
       await api(`/api/harvests/${id}`, { method: "PUT", body: JSON.stringify(payload) });
-      toast("Data panen diperbarui.");
+      toast(m("harvestUpdated"));
     } else {
       await api("/api/harvests", { method: "POST", body: JSON.stringify(payload) });
-      toast("Data panen ditambahkan.");
+      toast(m("harvestCreated"));
     }
     resetHarvestForm();
     await Promise.all([loadHarvests(), loadDashboard(), refreshChartWhenDashboardVisible()]);
@@ -726,12 +1073,12 @@ async function onHarvestAction(event) {
 
   const id = button.dataset.id;
   if (button.dataset.action === "delete") {
-    if (!confirm("Hapus data panen ini?")) {
+    if (!confirm(m("confirmDeleteHarvest"))) {
       return;
     }
     try {
       await api(`/api/harvests/${id}`, { method: "DELETE" });
-      toast("Data panen dihapus.");
+      toast(m("harvestDeleted"));
       await Promise.all([loadHarvests(), loadDashboard(), refreshChartWhenDashboardVisible()]);
     } catch (error) {
       toast(error.message, true);
@@ -740,17 +1087,15 @@ async function onHarvestAction(event) {
   }
 
   const row = button.closest("tr");
-  const typeText = row.children[1].textContent.trim();
-  const type = Object.entries(harvestLabel).find(([, label]) => label === typeText)?.[0] || "HORENSO";
 
   $("harvest-id").value = id;
   $("harvest-date").value = row.children[0].textContent;
-  $("harvest-type").value = type;
+  $("harvest-type").value = harvestCodeFromCellText(row.children[1].textContent);
   $("harvest-qty").value = row.children[2].textContent;
-  $("harvest-unit").value = String(row.children[3].textContent || "").trim().toLowerCase();
+  $("harvest-unit").value = unitCodeFromCellText(row.children[3].textContent);
   $("harvest-location").value = row.children[4].textContent === "-" ? "" : row.children[4].textContent;
   $("harvest-note").value = row.children[5].textContent === "-" ? "" : row.children[5].textContent;
-  $("harvest-submit").textContent = "Update Panen";
+  $("harvest-submit").textContent = m("updateHarvest");
   $("harvest-cancel").classList.remove("hidden");
   syncHarvestUnitByType();
 }
@@ -810,7 +1155,7 @@ async function loadSeparatedHarvestSeries(basePath, startDate, endDate) {
     const style = harvestChartStyle[harvestType];
     const byDate = dateMaps[harvestType] || new Map();
     return {
-      label: harvestLabel[harvestType] || harvestType,
+      label: harvestLabel(harvestType),
       data: labels.map((date) => byDate.get(date) || 0),
       borderColor: style.border,
       backgroundColor: style.background,
@@ -822,11 +1167,11 @@ async function loadSeparatedHarvestSeries(basePath, startDate, endDate) {
 }
 
 function renderCombinedChartTable(labels, dateMaps) {
-  const headers = ["Tanggal", ...harvestTypes.map((type) => harvestLabel[type] || type), "Total"];
+  const headers = [m("date"), ...harvestTypes.map((type) => harvestLabel(type)), m("total")];
   setChartTableHeader(headers);
 
   if (!labels.length) {
-    $("chart-body").innerHTML = `<tr><td colspan="${headers.length}">Belum ada data panen pada filter ini.</td></tr>`;
+    $("chart-body").innerHTML = `<tr><td colspan="${headers.length}">${m("emptyChart")}</td></tr>`;
     return;
   }
 
@@ -846,11 +1191,11 @@ function renderCombinedChartTable(labels, dateMaps) {
 }
 
 function renderSingleChartTable(items, harvestType) {
-  const label = harvestLabel[harvestType] || harvestType;
-  setChartTableHeader(["Tanggal", `Jumlah ${label}`]);
+  const label = harvestLabel(harvestType);
+  setChartTableHeader([m("date"), m("quantityLabel", { label })]);
 
   const html = items.map((item) => `<tr><td>${item.date}</td><td>${Number(item.total_qty) || 0}</td></tr>`).join("");
-  $("chart-body").innerHTML = html || `<tr><td colspan="2">Belum ada data panen pada filter ini.</td></tr>`;
+  $("chart-body").innerHTML = html || `<tr><td colspan="2">${m("emptyChart")}</td></tr>`;
 }
 
 async function loadChart() {
@@ -860,7 +1205,7 @@ async function loadChart() {
 
   if (harvestType === "ALL") {
     const { labels, datasets, dateMaps } = await loadSeparatedHarvestSeries("/api/charts/harvest-daily", startDate, endDate);
-    const chartLabels = labels.length ? labels : ["Belum ada data"];
+    const chartLabels = labels.length ? labels : [m("chartEmptyLabel")];
     const chartDatasets = labels.length ? datasets : datasets.map((dataset) => ({ ...dataset, data: [0] }));
     renderChart(chartLabels, chartDatasets);
     renderCombinedChartTable(labels, dateMaps);
@@ -880,10 +1225,10 @@ async function loadChart() {
   const style = harvestChartStyle[harvestType] || harvestChartStyle.HORENSO;
 
   renderChart(
-    labels.length ? labels : ["Belum ada data"],
+    labels.length ? labels : [m("chartEmptyLabel")],
     [
       {
-        label: `Jumlah ${harvestLabel[harvestType] || harvestType}`,
+        label: m("quantityLabel", { label: harvestLabel(harvestType) }),
         data: values.length ? values : [0],
         borderColor: style.border,
         backgroundColor: style.background,
@@ -912,6 +1257,15 @@ async function loadPageData(page) {
 }
 
 function installEvents() {
+  $("language-select").addEventListener("change", (event) => {
+    setLanguage(event.target.value).catch((error) => {
+      if (!state.user) {
+        renderPublicFallback(m("publicUnavailable"));
+      }
+      toast(error.message, true);
+    });
+  });
+
   $("login-form").addEventListener("submit", onLogin);
   $("show-login-btn").addEventListener("click", showLoginPanel);
   $("hide-login-btn").addEventListener("click", hideLoginPanel);
@@ -976,6 +1330,7 @@ function setInitialValues() {
 }
 
 async function bootstrap() {
+  applyTranslations();
   installEvents();
   setInitialValues();
   applyResponsiveTableLabels();
